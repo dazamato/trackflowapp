@@ -15,6 +15,10 @@ COPY ./pyproject.toml ./poetry.lock* /app/
 ARG INSTALL_DEV=false
 RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; else poetry install --no-root --only main ; fi"
 
+ARG INSTALL_JUPYTER=true
+RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then pip install jupyterlab ; fi"
+# RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then jupyter lab --ip=0.0.0.0 --allow-root --NotebookApp.custom_display_url=http://127.0.0.1:8888 ; fi"
+
 ENV PYTHONPATH=/app
 
 COPY ./scripts/ /app/

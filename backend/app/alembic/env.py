@@ -7,19 +7,26 @@ from sqlalchemy import engine_from_config, pool
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
-
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
-
-from app.models import SQLModel  # noqa
+from app.models.base import SQLModel  # noqa
 from app.core.config import settings # noqa
+from app.models.user_model import User
+from app.models.employee_model import Employee
+from app.models.business_model import Business
+from app.models.business_industry_model import BusinessIndustry
+from app.models.item_model import Item
+from app.models.product_model import Product
+from app.models.product_group_model import ProductGroup
+from app.models.product_tag_model import ProductTag
+from app.models.product_tag_link_model import ProductTagLink
+from app.models.base import Message, Token, TokenPayload, NewPassword
 
 target_metadata = SQLModel.metadata
 
