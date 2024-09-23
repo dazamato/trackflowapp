@@ -12,13 +12,10 @@ class EmployeeBase(SQLModel):
     description: Optional[str] = Field(default=None, max_length=255)
     role: Optional[str] = Field(default=None, max_length=100)
     is_active: bool = Field(default=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
 
 # Properties to receive on employee creation
 class EmployeeCreate(EmployeeBase):
-    user_id: uuid.UUID
-    business_id: Optional[uuid.UUID] = None
+    pass
 
 # Properties to receive on employee update
 class EmployeeUpdate(SQLModel):
@@ -34,19 +31,19 @@ class Employee(EmployeeBase, table=True):
     user_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
-    user: User | None = Relationship(back_populates="employees")
-
     business_id: uuid.UUID | None = Field(
         foreign_key="business.id", nullable=True, ondelete="CASCADE"
     )
-    business: Business | None = Relationship(back_populates="employees")
-    business_stages: list["BusinessStage"] | None = Relationship(back_populates="employee")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
 
 # Properties to return via API, id is always required
 class EmployeePublic(EmployeeBase):
     id: uuid.UUID
     user_id: uuid.UUID
     business_id: Optional[uuid.UUID] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
 
 class EmployeesPublic(SQLModel):
     data: List[EmployeePublic]

@@ -22,7 +22,6 @@ class BusinessBase(SQLModel):
 
 # Properties to receive on business creation
 class BusinessCreate(BusinessBase):
-    account_creator_id: uuid.UUID
     pass
 
 
@@ -51,6 +50,8 @@ class BusinessPublic(BusinessBase):
     id: uuid.UUID
     business_industry_id: Optional[uuid.UUID]
 
+class BusinessPublicID(SQLModel):
+    id: uuid.UUID
 
 class BusinessesPublic(SQLModel):
     data: list[BusinessPublic]

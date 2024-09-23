@@ -32,14 +32,14 @@ class BusinessStage(BusinessStageBase, table=True):
     business_id: uuid.UUID = Field(
         foreign_key="business.id", nullable=False, ondelete="CASCADE"
     )
-    private_id: uuid.UUID = Field(
-        foreign_key="private.id", nullable=False, ondelete="CASCADE"
+    employee_id: uuid.UUID = Field(
+        foreign_key="employee.id", nullable=False, ondelete="CASCADE"
     )
     stage_id: uuid.UUID = Field(
         foreign_key="stage.id", nullable=False, ondelete="CASCADE"
     )
     business: Business | None = Relationship(back_populates="business_stages")
-    employee: Employee | None = Relationship(back_populates="business_stages")
+    # employee: Employee | None = Relationship(back_populates="business_stages")
     stage: Stage | None = Relationship(back_populates="business_stages")
 
 
@@ -50,5 +50,5 @@ class BusinessStagePublic(BusinessStageBase):
 
 
 class BusinessStagesPublic(SQLModel):
-    data: list[BusinessStagePublic]
+    data: List[BusinessStagePublic]
     count: int

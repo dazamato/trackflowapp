@@ -1,7 +1,6 @@
 import uuid
 from typing import Optional, List
 from app.models.base import SQLModel, Field, Relationship
-from app.models.lead_model import Lead
 from app.models.business_model import Business
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -48,7 +47,6 @@ class Sale(SaleBase, table=True):
         foreign_key="lead.id", nullable=False, ondelete="CASCADE"
     )
     business: Business | None = Relationship(back_populates="sales")
-    lead: Lead | None = Relationship(back_populates="sale")
 
 
 # Properties to return via API, id is always required

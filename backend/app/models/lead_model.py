@@ -3,8 +3,8 @@ from pydantic import EmailStr
 from app.models.base import Field, Relationship, SQLModel
 from datetime import datetime
 from sqlalchemy.sql import func
-from business_model import Business
-from sale_model import Sale
+from app.models.business_model import Business
+from app.models.sale_model import Sale
 
 # Shared properties
 class LeadBase(SQLModel):
