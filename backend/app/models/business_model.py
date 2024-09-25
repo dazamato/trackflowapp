@@ -22,6 +22,9 @@ class BusinessBase(SQLModel):
 
 # Properties to receive on business creation
 class BusinessCreate(BusinessBase):
+    business_industry_id: Optional[uuid.UUID]
+
+class BusinessCreateSolo(BusinessBase):
     pass
 
 

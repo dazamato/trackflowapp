@@ -10,12 +10,18 @@ from jinja2 import Template
 from jwt.exceptions import InvalidTokenError
 
 from app.core.config import settings
+import uuid
 
 
 @dataclass
 class EmailData:
     html_content: str
     subject: str
+
+@dataclass
+class Invite:
+    email: str
+    business_id: uuid.UUID
 
 
 def render_email_template(*, template_name: str, context: dict[str, Any]) -> str:
@@ -115,3 +121,42 @@ def verify_password_reset_token(token: str) -> str | None:
         return str(decoded_token["sub"])
     except InvalidTokenError:
         return None
+
+
+def generate_invite_token(email: str, business_id: uuid.UUID) -> str:
+    delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)
+    now = datetime.now(timezone.utc)
+    expires = now + delta
+    exp = expires.timestamp()
+    encoded_jwt = jwt.encode(
+        {"exp": exp, "nbf": now, "sub": email, "business_id": str(business_id)},
+        settings.SECRET_KEY,
+        algorithm="HS256",
+    )
+    return encoded_jwt
+
+
+def verify_invite_token(token: str) -> Invite | None:
+    try:
+        decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        return Invite(email=str(decoded_token["sub"]), business_id=uuid.UUID(hex=decoded_token["business_id"]))
+    except InvalidTokenError:
+        return None
+
+
+def generate_invite_to_business_email(email_to: str, email: str, business_name: str, token: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Invite from company {business_name} to user {email}"
+    link = f"{settings.server_host}/employee/invite_register/?token={token}"
+    html_content = render_email_template(
+        template_name="business_invite.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "business_name": business_name,
+            "username": email,
+            "email": email_to,
+            "valid_hours": settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS,
+            "link": link,
+        },
+    )
+    return EmailData(html_content=html_content, subject=subject)

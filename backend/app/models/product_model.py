@@ -14,13 +14,10 @@ class ProductBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
     description: str | None = Field(default=None, max_length=255)
     sku: str = Field(min_length=1, max_length=255)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
 
 # Properties to receive on product creation
 class ProductCreate(ProductBase):
     product_group: uuid.UUID
-    product_tags: list[uuid.UUID]
 
 
 # Properties to receive on product update
@@ -40,6 +37,8 @@ class Product(ProductBase, table=True):
     product_group: uuid.UUID = Field(
         foreign_key="productgroup.id", nullable=False, ondelete="CASCADE"
     )
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
     creator: User | None = Relationship(back_populates="products")
     group: ProductGroup | None = Relationship(back_populates="products")
     # tags: list["ProductTag"] | None = Relationship(back_populates="products")

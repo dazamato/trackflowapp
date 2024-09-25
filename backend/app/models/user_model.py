@@ -15,8 +15,6 @@ class UserBase(SQLModel):
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
 
 
 # Properties to receive via API on creation
@@ -50,6 +48,8 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
     products: List["Product"] = Relationship(back_populates="creator", cascade_delete=True)
     product_groups: List["ProductGroup"] = Relationship(back_populates="creator", cascade_delete=True)
     product_tags: List["ProductTag"] = Relationship(back_populates="creator", cascade_delete=True)

@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional, List
 from app.models.base import Field, Relationship, SQLModel
-from app.models.user_model import User
+from app.models.user_model import User, UserCreate
 from app.models.business_model import Business
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -15,7 +15,7 @@ class EmployeeBase(SQLModel):
 
 # Properties to receive on employee creation
 class EmployeeCreate(EmployeeBase):
-    pass
+    business_id: uuid.UUID
 
 # Properties to receive on employee update
 class EmployeeUpdate(SQLModel):
@@ -42,12 +42,17 @@ class EmployeePublic(EmployeeBase):
     id: uuid.UUID
     user_id: uuid.UUID
     business_id: Optional[uuid.UUID] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
+    created_at: datetime
+    updated_at: datetime
 
 class EmployeesPublic(SQLModel):
     data: List[EmployeePublic]
     count: int
+
+class NewInvite(SQLModel):
+    token: str
+    new_user: UserCreate
+    new_employee: EmployeeBase
 
 # These are placeholder type hints. You should replace them with actual imports.
 # class User_model(SQLModel):

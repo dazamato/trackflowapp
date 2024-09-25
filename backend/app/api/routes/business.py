@@ -1,17 +1,24 @@
+from sqlalchemy.sql.operators import is_associative
 from typing_extensions import Optional
 import uuid
 from typing import Any
-
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
-
-from app.api.deps import CurrentUser, SessionDep
-from app.models.business_model import Business, BusinessCreate, BusinessPublic, BusinessPublic, BusinessUpdate, BusinessesPublic
+from app.api.deps import CurrentUser, SessionDep, retrieve_businesses_by_user_id
+from app.models.business_model import (Business, BusinessCreate, BusinessPublic, BusinessPublic
+    , BusinessUpdate, BusinessesPublic, BusinessCreateSolo)
+from app.models.employee_model import EmployeeCreate, Employee
 from app.models.business_industry_model import BusinessIndustryPublicId
 from app.models.base import Message
 from app.crud.crud_business import business_crud
+from app.crud.crud_employee import employee_crud
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
 
 
 @router.get("/", response_model=BusinessesPublic)
@@ -19,33 +26,13 @@ def read_my_businesses(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
-    Retrieve businesses.
+    Retrieve businesses by user.
     """
-
-    if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(Business)
-        count = session.exec(count_statement).one()
-        statement = select(Business).offset(skip).limit(limit)
-        businesses = session.exec(statement).all()
-    else:
-        count_statement = (
-            select(func.count())
-            .select_from(Business)
-            .where(Business.account_creator_id == current_user.id)
-        )
-        count = session.exec(count_statement).one()
-        statement = (
-            select(Business)
-            .where(Business.account_creator_id == current_user.id)
-            .offset(skip)
-            .limit(limit)
-        )
-        businesses = session.exec(statement).all()
-
-    return BusinessesPublic(data=businesses, count=count)
+    businesses = retrieve_businesses_by_user_id(session, current_user.id)
+    return businesses
 
 
-@router.get("/{id}", response_model=BusinessPublic)
+@router.get("/by_id/{id}", response_model=BusinessPublic)
 def read_business(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
     """
     Get business by ID.
@@ -57,27 +44,67 @@ def read_business(session: SessionDep, current_user: CurrentUser, id: uuid.UUID)
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return business
 
+@router.get("/all/", response_model=BusinessesPublic)
+def read_all_businesses(
+    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
+) -> Any:
+    """
+    Retrieve businesses.
+    """
+    # if current_user.is_superuser:
+    count_statement = select(func.count()).select_from(Business)
+    count = session.exec(count_statement).one()
+    statement = select(Business).offset(skip).limit(limit)
+    businesses = session.exec(statement).all()
+    return BusinessesPublic(data=businesses, count=count)
+
+@router.get("/created_by_me/", response_model=BusinessesPublic)
+def read_created_businesses(
+    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
+) -> Any:
+    """
+    Retrieve businesses.
+    """
+    count_statement = (
+        select(func.count())
+        .select_from(Business)
+        .where(Business.account_creator_id == current_user.id)
+    )
+    count = session.exec(count_statement).one()
+    statement = (
+        select(Business)
+        .where(Business.account_creator_id == current_user.id)
+        .offset(skip)
+        .limit(limit)
+    )
+    businesses = session.exec(statement).all()
+
+    return BusinessesPublic(data=businesses, count=count)
 
 @router.post("/", response_model=BusinessPublic)
 def create_business_with_industry(
-    *, session: SessionDep, current_user: CurrentUser, business_in: BusinessCreate, business_industry_id: BusinessIndustryPublicId
+    *, session: SessionDep, current_user: CurrentUser, business_in: BusinessCreate, employee_in: EmployeeCreate
 ) -> Any:
     """
     Create new business.
     """
-    print(business_industry_id)
     business = business_crud.create_business(session, business_in=business_in, account_creator_id=current_user.id
-        , business_industry_id=business_industry_id.id)
+        , business_industry_id=business_in.business_industry_id)
+    if not current_user.is_superuser:
+        employee = employee_crud.create_employee(session, employee_in=employee_in, user_id=current_user.id, business_id=business.id)
+    else:
+        pass
     return business
 
 @router.post("/without_industry/", response_model=BusinessPublic)
 def create_business_without_industry(
-    *, session: SessionDep, current_user: CurrentUser, business_in: BusinessCreate
+    *, session: SessionDep, current_user: CurrentUser, business_in: BusinessCreateSolo
 ) -> Any:
     """
     Create new business.
     """
-    business = business_crud.create_business(session, business_in=business_in, account_creator_id=current_user.id, business_industry_id=None)
+    business = business_crud.create_business(session, business_in=business_in, account_creator_id=current_user.id
+        , business_industry_id=None)
     return business
 
 

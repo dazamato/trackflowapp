@@ -11,8 +11,6 @@ class BusinessIndustryBase(SQLModel):
     description: str | None = Field(default=None, max_length=255)
     market_value: float | None = Field(default=None)
     image: str | None = Field(default=None, max_length=255)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
 
 
 # Properties to receive on business industry creation
@@ -32,6 +30,8 @@ class BusinessIndustry(BusinessIndustryBase, table=True):
     creator_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
     creator: User | None = Relationship(back_populates="business_industries")
     businesses: List['Business'] | None = Relationship(back_populates="business_industry")
 
@@ -40,6 +40,8 @@ class BusinessIndustry(BusinessIndustryBase, table=True):
 class BusinessIndustryPublic(BusinessIndustryBase):
     id: uuid.UUID
     creator_id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
 
 class BusinessIndustryPublicId(SQLModel):
     id: uuid.UUID

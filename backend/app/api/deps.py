@@ -1,18 +1,19 @@
 from collections.abc import Generator
-from typing import Annotated
-
+from typing import Annotated, Any
+import uuid
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
-from sqlmodel import Session
-
+from sqlmodel import Session, func, select
 from app.core import security
 from app.core.config import settings
 from app.core.db import engine
 from app.models.base import TokenPayload
 from app.models.user_model import User
+from app.models.employee_model import Employee
+from app.models.business_model import Business, BusinessesPublic
 
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -57,3 +58,27 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
             status_code=403, detail="The user doesn't have enough privileges"
         )
     return current_user
+
+def check_if_user_is_associetes_with_business(session: SessionDep, user_id: uuid.UUID, business_id: uuid.UUID) -> Any:
+    statement = select(Employee).where(Employee.user_id == user_id).where(Employee.business_id == business_id)
+    employee = session.exec(statement).first()
+    return employee is not None, employee
+
+def retrieve_businesses_by_user_id(session: SessionDep, user_id: uuid.UUID) -> BusinessesPublic:
+    count_statement = (
+        select(func.count())
+        .select_from(
+            select(Business).distinct()
+            .join(Employee)
+            .where(Employee.user_id == user_id)
+        )
+    )
+    count = session.exec(count_statement).one()
+    statement = (
+        select(Business)
+        .distinct()
+        .join(Employee)
+        .where(Employee.user_id == user_id)
+    )
+    businesses = session.exec(statement).all()
+    return BusinessesPublic(data=businesses, count=count)
