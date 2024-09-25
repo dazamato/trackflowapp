@@ -11,6 +11,10 @@ from app.models.business_model import Business, BusinessPublicID
 from app.models.base import Message
 from app.models.item_model import Item
 from app.crud.crud_product import product_crud
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -117,6 +121,7 @@ def update_product(
     Update an product.
     """
     product = session.get(Product, id)
+    logger.info(f"product!!! {product}")
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     if not current_user.is_superuser and (product.creator_id != current_user.id):

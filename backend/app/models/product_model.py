@@ -11,9 +11,9 @@ from sqlalchemy.sql import func
 from app.models.product_tag_link_model import ProductTagLink
 
 class ProductBase(SQLModel):
-    title: str = Field(min_length=1, max_length=255)
-    description: str | None = Field(default=None, max_length=255)
-    sku: str = Field(min_length=1, max_length=255)
+    title: str | None = Field(min_length=1, max_length=255)
+    description: str | None = Field(min_length=1, max_length=255)
+    sku: str | None = Field(min_length=1, max_length=255)
 
 # Properties to receive on product creation
 class ProductCreate(ProductBase):
@@ -22,10 +22,11 @@ class ProductCreate(ProductBase):
 
 # Properties to receive on product update
 class ProductUpdate(ProductBase):
-    title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    title: str | None = Field(default=None, min_length=1, max_length=255)   # type: ignore
+    description: str | None = Field(default=None, max_length=255)
+    sku: str | None = Field(default=None, min_length=1, max_length=255)
     product_group_id: uuid.UUID | None = Field(default=None)
-    product_tags: list[uuid.UUID] | None = Field(default=None)
-    moderated: bool = False
+    moderated: bool| None = Field(default=None, min_length=1, max_length=255)
 
 
 # Database model, database table inferred from class name
@@ -52,9 +53,9 @@ class Product(ProductBase, table=True):
 # Properties to return via API, id is always required
 class ProductPublic(ProductBase):
     id: uuid.UUID
-    owner_id: uuid.UUID
-    product_group: uuid.UUID
-    product_tags: list[uuid.UUID]
+    creator_id: uuid.UUID
+    product_group_id: uuid.UUID
+    tags: list[uuid.UUID]
 
 
 class ProductsPublic(SQLModel):
