@@ -82,3 +82,13 @@ def retrieve_businesses_by_user_id(session: SessionDep, user_id: uuid.UUID) -> B
     )
     businesses = session.exec(statement).all()
     return BusinessesPublic(data=businesses, count=count)
+
+def retrieve_first_business_by_user_id(session: SessionDep, user_id: uuid.UUID) -> Business:
+    statement = (
+        select(Business)
+        .distinct()
+        .join(Employee)
+        .where(Employee.user_id == user_id)
+    )
+    business = session.exec(statement).first()
+    return business

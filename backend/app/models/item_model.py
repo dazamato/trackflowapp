@@ -13,25 +13,25 @@ class ItemBase(SQLModel):
     description: str | None = Field(default=None, max_length=255)
     price: Optional[float] = None
     cost_price: Optional[float] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
 
 
 
 # Properties to receive on item creation
 class ItemCreate(ItemBase):
-    pass
+    product_id: uuid.UUID | None = None
 
 
 # Properties to receive on item update
 class ItemUpdate(ItemBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
-
+    product_id: uuid.UUID | None = None
 
 # Database model, database table inferred from class name
 class Item(ItemBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     title: str = Field(max_length=255)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
     owner_id: uuid.UUID = Field(
         foreign_key="business.id", nullable=False, ondelete="CASCADE"
     )
