@@ -17,24 +17,26 @@ class ProductBase(SQLModel):
 
 # Properties to receive on product creation
 class ProductCreate(ProductBase):
-    product_group: uuid.UUID
+    product_group_id: uuid.UUID
 
 
 # Properties to receive on product update
 class ProductUpdate(ProductBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
-    product_group: uuid.UUID | None = Field(default=None)
+    product_group_id: uuid.UUID | None = Field(default=None)
     product_tags: list[uuid.UUID] | None = Field(default=None)
+    moderated: bool = False
 
 
 # Database model, database table inferred from class name
 class Product(ProductBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     title: str = Field(max_length=255)
+    moderated: bool = False
     creator_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
-    product_group: uuid.UUID = Field(
+    product_group_id: uuid.UUID = Field(
         foreign_key="productgroup.id", nullable=False, ondelete="CASCADE"
     )
     created_at: datetime = Field(default_factory=datetime.utcnow)
