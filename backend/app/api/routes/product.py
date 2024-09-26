@@ -10,6 +10,8 @@ from app.models.product_model import Product, ProductCreate, ProductPublic, Prod
 from app.models.business_model import Business, BusinessPublicID
 from app.models.base import Message
 from app.models.item_model import Item
+from app.models.product_tag_link_model import ProductTagLink
+from app.models.product_tag_model import ProductTag
 from app.crud.crud_product import product_crud
 import logging
 
@@ -107,6 +109,37 @@ def create_product_with_group(
     if not current_user.is_superuser and (not businesses.count==0):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     product = product_crud.create_product(session=session, product_in=product_in, creator_id=current_user.id, product_group_id=product_in.product_group_id)
+    return product
+
+@router.put("/taglink/", response_model=ProductPublic)
+def add_product_tag_link_to_product(
+    *, session: SessionDep, current_user: CurrentUser, product_tag_link: ProductTagLink
+) -> Any:
+    """
+    Create new product_tag_link.
+    """
+    product = session.get(Product, product_tag_link.product_id)
+    logger.info(f"product!!! {product}")
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    if not current_user.is_superuser and (product.creator_id != current_user.id):
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    product_tag = session.get(ProductTag, product_tag_link.product_tag_id)
+    if not product_tag:
+        raise HTTPException(status_code=404, detail="ProductTag not found")
+    logger.info(f"product_tag: {product_tag}")
+    tags = product.tags + [product_tag]
+    logger.info(f"tags: {tags}")
+    product_in = ProductUpdate(
+        tags = product.tags + [product_tag]
+    )
+    logger.info(f"product_in: {product_in}")
+    update_dict = product_in.model_dump(exclude_unset=True)
+    product.sqlmodel_update(update_dict)
+    session.add(product)
+    session.add(product_tag_link)
+    session.commit()
+    session.refresh(product)
     return product
 
 @router.put("/{id}", response_model=ProductPublic)

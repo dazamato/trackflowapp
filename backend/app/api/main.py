@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import items, login, users, utils, business, business_industry, employee, product_group, product
+from app.api.routes import items, login, users, utils, business, business_industry, employee, product_group, product, product_tag
 
 api_router = APIRouter()
 api_router.include_router(login.router, tags=["login"])
@@ -12,3 +12,4 @@ api_router.include_router(business.router, prefix="/business", tags=["business"]
 api_router.include_router(employee.router, prefix="/employee", tags=["employee"])
 api_router.include_router(product_group.router, prefix="/product_group", tags=["product_group"])
 api_router.include_router(product.router, prefix="/product", tags=["product"])
+api_router.include_router(product_tag.router, prefix="/product_tag", tags=["product_tag"])

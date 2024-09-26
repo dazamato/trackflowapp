@@ -11,8 +11,6 @@ from sqlalchemy.sql import func
 class ProductTagBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
     description: str | None = Field(default=None, max_length=255)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
 
 
 # Properties to receive on product tag creation
@@ -32,6 +30,8 @@ class ProductTag(ProductTagBase, table=True):
     creator_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
     creator: User | None = Relationship(back_populates="product_tags")
     products: list["Product"] = Relationship(back_populates="tags", link_model=ProductTagLink)
 

@@ -27,6 +27,8 @@ class ProductUpdate(ProductBase):
     sku: str | None = Field(default=None, min_length=1, max_length=255)
     product_group_id: uuid.UUID | None = Field(default=None)
     moderated: bool| None = Field(default=None, min_length=1, max_length=255)
+    tags: list[ProductTag] | None = Field(default=[])
+
 
 
 # Database model, database table inferred from class name
@@ -55,7 +57,7 @@ class ProductPublic(ProductBase):
     id: uuid.UUID
     creator_id: uuid.UUID
     product_group_id: uuid.UUID
-    tags: list[uuid.UUID]
+    tags: list[ProductTag]
 
 
 class ProductsPublic(SQLModel):
