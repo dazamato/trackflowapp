@@ -1,7 +1,6 @@
 import uuid
 from typing import Optional, List
 from app.models.base import SQLModel, Field, Relationship
-from app.models.business_model import Business
 from datetime import datetime
 from sqlalchemy.sql import func
 
@@ -40,19 +39,14 @@ class SaleUpdate(SaleBase):
 # Database model, database table inferred from class name
 class Sale(SaleBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    business_id: uuid.UUID = Field(
-        foreign_key="business.id", nullable=False, ondelete="CASCADE"
-    )
     lead_id: uuid.UUID = Field(
         foreign_key="lead.id", nullable=False, ondelete="CASCADE"
     )
-    business: Business | None = Relationship(back_populates="sales")
 
 
 # Properties to return via API, id is always required
 class SalePublic(SaleBase):
     id: uuid.UUID
-    business_id: uuid.UUID
     lead_id: uuid.UUID
 
 

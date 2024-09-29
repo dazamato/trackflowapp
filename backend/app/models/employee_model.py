@@ -1,10 +1,11 @@
 import uuid
 from typing import Optional, List
 from app.models.base import Field, Relationship, SQLModel
-from app.models.user_model import User, UserCreate
 from app.models.business_model import Business
 from datetime import datetime
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from pydantic import EmailStr
 
 # Shared properties
 class EmployeeBase(SQLModel):
@@ -25,6 +26,10 @@ class EmployeeUpdate(SQLModel):
     is_active: Optional[bool] = None
     business_id: Optional[int] = None
 
+class UserShow(SQLModel):
+    email: EmailStr = Field(unique=True, index=True, max_length=255)
+    full_name: str | None = Field(default=None, max_length=255)
+    
 # Database model, database table inferred from class name
 class Employee(EmployeeBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
@@ -34,14 +39,19 @@ class Employee(EmployeeBase, table=True):
     business_id: uuid.UUID | None = Field(
         foreign_key="business.id", nullable=True, ondelete="CASCADE"
     )
+    business: Business | None = Relationship(back_populates="employees")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
+
+
+
 
 # Properties to return via API, id is always required
 class EmployeePublic(EmployeeBase):
     id: uuid.UUID
     user_id: uuid.UUID
-    business_id: Optional[uuid.UUID] = None
+    owner: UserShow
+    business: Business | None
     created_at: datetime
     updated_at: datetime
 
@@ -49,10 +59,7 @@ class EmployeesPublic(SQLModel):
     data: List[EmployeePublic]
     count: int
 
-class NewInvite(SQLModel):
-    token: str
-    new_user: UserCreate
-    new_employee: EmployeeBase
+
 
 # These are placeholder type hints. You should replace them with actual imports.
 # class User_model(SQLModel):

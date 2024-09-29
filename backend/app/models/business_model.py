@@ -39,13 +39,8 @@ class Business(BusinessBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     business_industry_id: Optional[uuid.UUID] = Field(foreign_key="businessindustry.id", nullable=True)
     business_industry: BusinessIndustry | None = Relationship(back_populates="businesses")
-    account_creator_id: uuid.UUID = Field(foreign_key="user.id")
-    # employees: List["Employee"] = Relationship(back_populates="business")
+    employees: List["Employee"] = Relationship(back_populates="business")
     items: List["Item"] = Relationship(back_populates="owner")
-    # leads: List["Lead"] = Relationship(back_populates="business")
-    # sales: List["Sale"] = Relationship(back_populates="business")
-    # stages: List["Stage"] = Relationship(back_populates="business")
-    # business_stages: List["BusinessStage"] = Relationship(back_populates="business")
 
 
 # Properties to return via API, id is always required

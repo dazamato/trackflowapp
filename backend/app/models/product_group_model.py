@@ -1,7 +1,6 @@
 import uuid
 from pydantic import EmailStr
 from app.models.base import Field, Relationship, SQLModel
-from app.models.user_model import User
 from datetime import datetime
 from sqlalchemy.sql import func
 
@@ -27,17 +26,12 @@ class ProductGroup(ProductGroupBase, table=True):
     title: str = Field(max_length=255)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
-    creator_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
-    )
-    creator: User | None = Relationship(back_populates="product_groups")
     products: list['Product'] | None = Relationship(back_populates="group")
 
 
 # Properties to return via API, id is always required
 class ProductGroupPublic(ProductGroupBase):
     id: uuid.UUID
-    creator_id: uuid.UUID
 
 
 class ProductGroupsPublic(SQLModel):

@@ -27,8 +27,9 @@ from app.models.product_group_model import ProductGroup
 from app.models.product_tag_model import ProductTag
 from app.models.product_tag_link_model import ProductTagLink
 from app.models.sale_model import Sale
-from app.models.business_stage_model import BusinessStage
-from app.models.stage_model import Stage
+from app.models.proposal_model import Proposal
+# from app.models.business_stage_model import BusinessStage
+# from app.models.stage_model import Stage
 from app.models.lead_model import Lead
 
 from app.models.base import Message, Token, TokenPayload, NewPassword

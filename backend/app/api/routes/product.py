@@ -51,7 +51,7 @@ def read_my_products(
     return ProductsPublic(data=products, count=count)
 
 @router.get("/by_product_group/", response_model=ProductsPublic)
-def read_business_products(
+def read_products_group(
     session: SessionDep, current_user: CurrentUser, product_group_id: uuid.UUID, skip: int = 0, limit: int = 100
 ) -> Any:
     """
@@ -81,6 +81,57 @@ def read_business_products(
         .limit(limit)
     )
     products = session.exec(statement).all()
+    return ProductsPublic(data=products, count=count)
+
+
+@router.get("/by_business/", response_model=ProductsPublic)
+def read_by_business(
+    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
+) -> Any:
+    """
+    Retrieve products.
+    """
+    # check if current_user has employee
+    businesses = retrieve_businesses_by_user_id(session, current_user.id)
+    if not current_user.is_superuser and (not businesses.count==0):
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    
+    # Get items of the business
+    items_statement = (
+        select(Item)
+        .where(Item.business_id.in_([business.id for business in businesses]))
+    )
+    items = session.exec(items_statement).all()
+
+    # Get all products of the business which has items
+    count_statement = (
+        select(func.count())
+        .select_from(Product)
+        .where(Product.id.in_([item.product_id for item in items]))
+    )
+    count = session.exec(count_statement).one()
+    statement = (
+        select(Product)
+        .where(Product.id.in_([item.product_id for item in items]))
+        .offset(skip)
+        .limit(limit)
+    )
+    products = session.exec(statement).all()
+
+    # Get all products of the business which has items
+    # count_statement = (
+    #     select(func.count())
+    #     .select_from(Product)
+    #     .where(Product.product_group_id == product_group.id)
+    # )
+    # count = session.exec(count_statement).one()
+    # statement = (
+    #     select(Product)
+    #     .where(Product.product_group_id == product_group.id)
+    #     .offset(skip)
+    #     .limit(limit)
+    # )
+    # products = session.exec(statement).all()
     return ProductsPublic(data=products, count=count)
 
 

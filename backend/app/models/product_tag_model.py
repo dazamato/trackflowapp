@@ -1,7 +1,6 @@
 import uuid
 from pydantic import EmailStr
 from app.models.base import Field, Relationship, SQLModel
-from app.models.user_model import User
 from app.models.product_tag_link_model import ProductTagLink
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -10,7 +9,6 @@ from sqlalchemy.sql import func
 
 class ProductTagBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
-    description: str | None = Field(default=None, max_length=255)
 
 
 # Properties to receive on product tag creation
@@ -27,12 +25,8 @@ class ProductTagUpdate(ProductTagBase):
 class ProductTag(ProductTagBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     title: str = Field(max_length=255)
-    creator_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
-    )
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
-    creator: User | None = Relationship(back_populates="product_tags")
     products: list["Product"] = Relationship(back_populates="tags", link_model=ProductTagLink)
 
 

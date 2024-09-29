@@ -3,43 +3,42 @@ from pydantic import EmailStr
 from app.models.base import Field, Relationship, SQLModel
 from datetime import datetime
 from sqlalchemy.sql import func
-from app.models.business_model import Business
 from app.models.sale_model import Sale
+from app.models.proposal_model import Proposal
 
 # Shared properties
 class LeadBase(SQLModel):
-    customer_name: str = Field(min_length=1, max_length=255)
-    customer_phone: str = Field(min_length=1, max_length=255)
+    customer_name: str | None = Field(min_length=1, max_length=255)
+    lead_source: str | None = Field(default=None, max_length=255)
+    customer_phone: str | None = Field(min_length=1, max_length=255)
     customer_email: str | None = Field(default=None, max_length=255)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
-    customer_id: uuid.UUID | None = Field(default=None)
-    lead_product: uuid.UUID | None = Field(default=None)
-    lead_quantity: int | None = Field(default=None)
-    lead_preferable_price_per_item: float | None = Field(default=None)
-    lead_comments: str | None = Field(default=None, max_length=255)
-    lead_supporter_id: uuid.UUID | None = Field(default=None)
-    lead_business_stage_id: uuid.UUID | None = Field(default=None)
+    lead_status: str | None = Field(default=None, max_length=255)
+    
 # Properties to receive on lead creation
 class LeadCreate(LeadBase):
-    pass
+    business_id: uuid.UUID
+
 
 
 # Properties to receive on lead update
 class LeadUpdate(LeadBase):
-    customer_name: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    sale_id: uuid.UUID | None = Field(default=None)
+
 
 
 # Database model, database table inferred from class name
 class Lead(LeadBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     customer_name: str = Field(max_length=255)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
     business_id: uuid.UUID = Field(
         foreign_key="business.id", nullable=False, ondelete="CASCADE"
     )
-    business: Business | None = Relationship(back_populates="leads")
+    business: "Business" | None = Relationship(back_populates="leads")
     sale_id: uuid.UUID | None = Field(default=None)
-    sale: Sale | None = Relationship(back_populates="leads")
+    sale: Sale | None = Relationship(back_populates="lead")
+    proposals: list[Proposal] = Relationship(back_populates="lead")
 
 
 # Properties to return via API, id is always required

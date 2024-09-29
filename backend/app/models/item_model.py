@@ -2,8 +2,8 @@ from typing_extensions import Optional
 import uuid
 from pydantic import EmailStr
 from app.models.base import Field, Relationship, SQLModel
-from app.models.business_model import Business
 from app.models.product_model import Product
+from app.models.business_model import Business
 from datetime import datetime
 from sqlalchemy.sql import func
 

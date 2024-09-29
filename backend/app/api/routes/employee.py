@@ -1,12 +1,11 @@
 from typing_extensions import Optional
 import uuid
 from typing import Any
-
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
-
 from app.api.deps import CurrentUser, SessionDep, check_if_user_is_associetes_with_business
-from app.models.employee_model import Employee, EmployeeCreate, EmployeePublic, EmployeePublic, EmployeeUpdate, EmployeesPublic, NewInvite
+from app.models.employee_model import Employee, EmployeeCreate, EmployeePublic, EmployeePublic, EmployeeUpdate, EmployeesPublic
+from app.models.invite_model import NewInvite
 from app.models.business_model import Business, BusinessPublicID
 from app.models.base import Message
 from app.crud.crud_employee import employee_crud
@@ -98,7 +97,7 @@ def create_admin_employee_with_business(
     session: SessionDep, current_user: CurrentUser, employee_in: EmployeeCreate
 ) -> Any:
     """
-    # TODO Register as new employee using invitation hash.
+    # Register as new employee by admin.
     """
     if not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Not enough permissions")

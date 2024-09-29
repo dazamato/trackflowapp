@@ -1,9 +1,11 @@
 import uuid
 from pydantic import EmailStr
-from typing import Optional, List
+from typing import Optional, List, Any
 from app.models.base import Field, Relationship, SQLModel
 from datetime import datetime
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from app.models.employee_model import Employee
 
 # from sqlalchemy.orm import Mapped, relationship
 
@@ -50,16 +52,14 @@ class User(UserBase, table=True):
     hashed_password: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
-    products: List["Product"] = Relationship(back_populates="creator", cascade_delete=True)
-    product_groups: List["ProductGroup"] = Relationship(back_populates="creator", cascade_delete=True)
-    product_tags: List["ProductTag"] = Relationship(back_populates="creator", cascade_delete=True)
-    business_industries: List["BusinessIndustry"] = Relationship(back_populates="creator", cascade_delete=True)
+    employee: Employee | None = Relationship(cascade_delete=True)
 
 
 
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
+    employee: Employee
 
 
 class UsersPublic(SQLModel):
