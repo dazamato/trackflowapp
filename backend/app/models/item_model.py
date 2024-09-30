@@ -32,10 +32,10 @@ class Item(ItemBase, table=True):
     title: str = Field(max_length=255)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
-    owner_id: uuid.UUID = Field(
+    business_id: uuid.UUID = Field(
         foreign_key="business.id", nullable=False, ondelete="CASCADE"
     )
-    owner: Business | None = Relationship(back_populates="items")
+    business: Business | None = Relationship(back_populates="items")
     product_id: uuid.UUID = Field(
         foreign_key="product.id", nullable=False
     )

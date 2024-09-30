@@ -14,6 +14,8 @@ from app.models.base import TokenPayload
 from app.models.user_model import User
 from app.models.employee_model import Employee
 from app.models.business_model import Business, BusinessesPublic
+from app.models.product_model import Product, ProductsPublic
+from app.models.item_model import Item
 
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -72,3 +74,52 @@ def retrieve_businesses_by_user_id(session: SessionDep, user_id: uuid.UUID) -> B
     )
     business = session.exec(statement).first()
     return business
+
+
+def retrieve_products_by_business_id(session: SessionDep, business_id: uuid.UUID, product_group_id: uuid.UUID|None = None) -> ProductsPublic:
+    if product_group_id:
+        items_statement = (
+            select(Item)
+            .where(Item.business_id == business_id)
+        )
+        items = session.exec(items_statement).all()
+
+        # Get all products of the business which has items
+        if len(items)==0:
+            raise HTTPException(status_code=400, detail="Your business has no items")
+        
+        count_statement = (
+            select(func.count())
+            .select_from(Product)
+            .where(Product.id.in_([item.product_id for item in items]))
+        )
+        count = session.exec(count_statement).one()
+        statement = (
+            select(Product)
+            .where(Product.id.in_([item.product_id for item in items]))
+        )
+        products = session.exec(statement).all()
+    else:
+        items_statement = (
+            select(Item)
+            .where(Item.business_id == business_id)
+        )
+        items = session.exec(items_statement).all()
+
+        # Get all products of the business which has items
+        if len(items)==0:
+            raise HTTPException(status_code=400, detail="Your business has no items")
+        count_statement = (
+            select(func.count())
+            .select_from(Product)
+            .where(Product.id.in_([item.product_id for item in items]) & Product.product_group_id==product_group_id)
+        )
+        count = session.exec(count_statement).one()
+        statement = (
+            select(Product)
+            .where(Product.id.in_([item.product_id for item in items]) & Product.product_group_id==product_group_id)
+        )
+        products = session.exec(statement).all()
+        
+    
+    return ProductsPublic(data=products, count=count)

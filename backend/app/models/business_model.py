@@ -40,7 +40,7 @@ class Business(BusinessBase, table=True):
     business_industry_id: Optional[uuid.UUID] = Field(foreign_key="businessindustry.id", nullable=True)
     business_industry: BusinessIndustry | None = Relationship(back_populates="businesses")
     employees: List["Employee"] = Relationship(back_populates="business")
-    items: List["Item"] = Relationship(back_populates="owner")
+    items: List["Item"] = Relationship(back_populates="business")
     # leads: List["Lead"] = Relationship(back_populates="business")
 
 
