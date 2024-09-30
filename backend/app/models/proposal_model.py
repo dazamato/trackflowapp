@@ -30,7 +30,6 @@ class Proposal(ProposalBase, table=True):
     lead_id: uuid.UUID = Field(
         foreign_key="lead.id", nullable=False, ondelete="CASCADE"
     )
-    lead: "Lead" | None = Relationship(back_populates="proposals")
     product_id: uuid.UUID = Field(
         foreign_key="product.id", nullable=False
     )

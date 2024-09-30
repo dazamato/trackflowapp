@@ -7,11 +7,11 @@ from app.backend_pre_start import logger
 
 
 class CRUDBusiness(CRUDBase[Business, BusinessCreate, BusinessUpdate]):
-    def create_business(self, session: Session, business_in: BusinessCreate, account_creator_id: uuid.UUID, business_industry_id: Optional[uuid.UUID]) -> Business:
+    def create_business(self, session: Session, business_in: BusinessCreate, business_industry_id: Optional[uuid.UUID]) -> Business:
         if business_industry_id:
-            db_item = Business.model_validate(business_in, update={"account_creator_id": account_creator_id, "business_industry_id": business_industry_id})
+            db_item = Business.model_validate(business_in, update={"business_industry_id": business_industry_id})
         else:
-            db_item = Business.model_validate(business_in, update={"account_creator_id": account_creator_id, "business_industry_id": None})
+            db_item = Business.model_validate(business_in, update={"business_industry_id": None})
         session.add(db_item)
         session.commit()
         session.refresh(db_item)

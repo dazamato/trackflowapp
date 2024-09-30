@@ -41,6 +41,7 @@ class Business(BusinessBase, table=True):
     business_industry: BusinessIndustry | None = Relationship(back_populates="businesses")
     employees: List["Employee"] = Relationship(back_populates="business")
     items: List["Item"] = Relationship(back_populates="owner")
+    # leads: List["Lead"] = Relationship(back_populates="business")
 
 
 # Properties to return via API, id is always required

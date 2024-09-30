@@ -6,3 +6,8 @@ class NewInvite(SQLModel):
     token: str
     new_user: UserCreate
     new_employee: EmployeeBase
+    
+    
+class NewRegInvite(SQLModel):
+    token: str
+    new_employee: EmployeeBase

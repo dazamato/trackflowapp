@@ -4,7 +4,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
 
-from app.api.deps import CurrentUser, SessionDep, retrieve_first_business_by_user_id
+from app.api.deps import CurrentUser, SessionDep, retrieve_businesses_by_user_id
 from app.models.item_model import Item, ItemCreate, ItemPublic, ItemsPublic, ItemUpdate
 from app.models.base import Message
 from app.crud.crude_item import item_crud
@@ -20,7 +20,7 @@ def read_all_items(
     Retrieve items.
     """
     # get business in which user is registered as employee
-    business = retrieve_first_business_by_user_id(session, current_user.id)
+    business = retrieve_businesses_by_user_id(session, current_user.id)
     if not business:
         raise HTTPException(
             status_code=404,
@@ -57,7 +57,7 @@ def read_products_items(
     Retrieve items.
     """
     # get business in which user is registered as employee
-    business = retrieve_first_business_by_user_id(session, current_user.id)
+    business = retrieve_businesses_by_user_id(session, current_user.id)
     if not business:
         raise HTTPException(
             status_code=404,
@@ -87,7 +87,7 @@ def read_item(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> 
     item = session.get(Item, id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    business = retrieve_first_business_by_user_id(session, current_user.id)
+    business = retrieve_businesses_by_user_id(session, current_user.id)
     if not business:
         raise HTTPException(
             status_code=404,
@@ -106,7 +106,7 @@ def create_item(
     """
     Create new item.
     """
-    business = retrieve_first_business_by_user_id(session, current_user.id)
+    business = retrieve_businesses_by_user_id(session, current_user.id)
     if not business:
         raise HTTPException(
             status_code=404,
@@ -130,7 +130,7 @@ def update_item(
     item = session.get(Item, id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    business = retrieve_first_business_by_user_id(session, current_user.id)
+    business = retrieve_businesses_by_user_id(session, current_user.id)
     if not business:
         raise HTTPException(
             status_code=404,
@@ -156,7 +156,7 @@ def delete_item(
     item = session.get(Item, id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    business = retrieve_first_business_by_user_id(session, current_user.id)
+    business = retrieve_businesses_by_user_id(session, current_user.id)
     if not business:
         raise HTTPException(
             status_code=404,

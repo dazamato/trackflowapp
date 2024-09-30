@@ -35,7 +35,6 @@ class BusinessIndustry(BusinessIndustryBase, table=True):
 # Properties to return via API, id is always required
 class BusinessIndustryPublic(BusinessIndustryBase):
     id: uuid.UUID
-    creator_id: uuid.UUID
     created_at: datetime
     updated_at: datetime
 

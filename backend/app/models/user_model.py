@@ -59,7 +59,7 @@ class User(UserBase, table=True):
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
-    employee: Employee
+    employee: Employee | None
 
 
 class UsersPublic(SQLModel):

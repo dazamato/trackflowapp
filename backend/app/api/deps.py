@@ -64,29 +64,9 @@ def check_if_user_is_associetes_with_business(session: SessionDep, user_id: uuid
     employee = session.exec(statement).first()
     return employee is not None, employee
 
-def retrieve_businesses_by_user_id(session: SessionDep, user_id: uuid.UUID) -> BusinessesPublic:
-    count_statement = (
-        select(func.count())
-        .select_from(
-            select(Business).distinct()
-            .join(Employee)
-            .where(Employee.user_id == user_id)
-        )
-    )
-    count = session.exec(count_statement).one()
+def retrieve_businesses_by_user_id(session: SessionDep, user_id: uuid.UUID) -> Business:
     statement = (
         select(Business)
-        .distinct()
-        .join(Employee)
-        .where(Employee.user_id == user_id)
-    )
-    businesses = session.exec(statement).all()
-    return BusinessesPublic(data=businesses, count=count)
-
-def retrieve_first_business_by_user_id(session: SessionDep, user_id: uuid.UUID) -> Business:
-    statement = (
-        select(Business)
-        .distinct()
         .join(Employee)
         .where(Employee.user_id == user_id)
     )

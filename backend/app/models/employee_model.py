@@ -17,6 +17,10 @@ class EmployeeBase(SQLModel):
 # Properties to receive on employee creation
 class EmployeeCreate(EmployeeBase):
     business_id: uuid.UUID
+    
+class EmployeeCreateAdmin(EmployeeBase):
+    business_id: uuid.UUID
+    user_id: uuid.UUID
 
 # Properties to receive on employee update
 class EmployeeUpdate(SQLModel):
@@ -50,7 +54,6 @@ class Employee(EmployeeBase, table=True):
 class EmployeePublic(EmployeeBase):
     id: uuid.UUID
     user_id: uuid.UUID
-    owner: UserShow
     business: Business | None
     created_at: datetime
     updated_at: datetime

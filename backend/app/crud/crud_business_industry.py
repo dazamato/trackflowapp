@@ -9,8 +9,8 @@ from app.backend_pre_start import logger
 
 
 class CRUDBusinessIndustry(CRUDBase[BusinessIndustry, BusinessIndustryCreate, BusinessIndustryUpdate]):
-    def create_business_industry(self, session: Session, business_industry_in: BusinessIndustryCreate, creator_id: uuid.UUID) -> BusinessIndustry:
-        db_item = BusinessIndustry.model_validate(business_industry_in, update={"creator_id": creator_id})
+    def create_business_industry(self, session: Session, business_industry_in: BusinessIndustryCreate) -> BusinessIndustry:
+        db_item = BusinessIndustry.model_validate(business_industry_in)
         session.add(db_item)
         session.commit()
         session.refresh(db_item)

@@ -3,9 +3,9 @@ import uuid
 from typing import Any
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
-from app.api.deps import CurrentUser, SessionDep, check_if_user_is_associetes_with_business
-from app.models.employee_model import Employee, EmployeeCreate, EmployeePublic, EmployeePublic, EmployeeUpdate, EmployeesPublic
-from app.models.invite_model import NewInvite
+from app.api.deps import CurrentUser, SessionDep, retrieve_businesses_by_user_id
+from app.models.employee_model import Employee, EmployeeCreate, EmployeeCreateAdmin, EmployeePublic, EmployeePublic, EmployeeUpdate, EmployeesPublic
+from app.models.invite_model import NewInvite, NewRegInvite
 from app.models.business_model import Business, BusinessPublicID
 from app.models.base import Message
 from app.crud.crud_employee import employee_crud
@@ -15,37 +15,23 @@ from app.utils import generate_invite_token, verify_invite_token, generate_invit
 
 router = APIRouter()
 
-@router.get("/", response_model=EmployeesPublic)
+@router.get("/", response_model=EmployeePublic)
 def read_my_employees(
-    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
+    session: SessionDep, current_user: CurrentUser
 ) -> Any:
     """
     Retrieve employees.
     """
+    statement = (
+        select(Employee)
+        .where(Employee.user_id == current_user.id)
+    )
+    employee = session.exec(statement).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="User not registered as employee")
+    return employee
 
-    if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(Employee)
-        count = session.exec(count_statement).one()
-        statement = select(Employee).offset(skip).limit(limit)
-        employees = session.exec(statement).all()
-    else:
-        count_statement = (
-            select(func.count())
-            .select_from(Employee)
-            .where(Employee.user_id == current_user.id)
-        )
-        count = session.exec(count_statement).one()
-        statement = (
-            select(Employee)
-            .where(Employee.user_id == current_user.id)
-            .offset(skip)
-            .limit(limit)
-        )
-        employees = session.exec(statement).all()
-
-    return EmployeesPublic(data=employees, count=count)
-
-@router.get("/", response_model=EmployeesPublic)
+@router.get("/business", response_model=EmployeesPublic)
 def read_business_employees(
     session: SessionDep, current_user: CurrentUser, business_id: uuid.UUID, skip: int = 0, limit: int = 100
 ) -> Any:
@@ -57,8 +43,9 @@ def read_business_employees(
     if not business:
         raise HTTPException(status_code=404, detail="Business not found")
     # Get employees of the business
-    associated, associated_employee = check_if_user_is_associetes_with_business(session, current_user.id, business_id)
-    if not current_user.is_superuser and (not associated):
+    
+    accessed_business = retrieve_businesses_by_user_id(session, current_user.id)
+    if not current_user.is_superuser and (business.id != accessed_business.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
 
     # Get all employees of the business
@@ -86,24 +73,71 @@ def read_employee(session: SessionDep, current_user: CurrentUser, id: uuid.UUID,
     employee = session.get(Employee, id)
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
-    associated, associated_employee = check_if_user_is_associetes_with_business(session, current_user.id, business_id)
-    if not current_user.is_superuser and (not associated):
+    
+    business = session.get(Business, business_id)
+    if not business:
+        raise HTTPException(status_code=404, detail="Business not found")
+    
+    accessed_business = retrieve_businesses_by_user_id(session, current_user.id)
+    
+    if not current_user.is_superuser and (business.id != accessed_business.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return employee
 
 
-@router.post("/", response_model=EmployeePublic)
-def create_admin_employee_with_business(
+@router.post("/first/", response_model=EmployeePublic)
+def create_first_employee_with_business(
     session: SessionDep, current_user: CurrentUser, employee_in: EmployeeCreate
 ) -> Any:
     """
     # Register as new employee by admin.
     """
+    # check user if it exists as employee
+    statement_check_empl = (
+        select(func.count())
+        .select_from(Employee)
+        .where(Employee.user_id == current_user.id)
+    )
+    employee_check_cnt = session.exec(statement_check_empl).one()
+    count_statement = (
+        select(func.count())
+        .select_from(Employee)
+        .where(Employee.business_id == employee_in.business_id)
+    )
+    count = session.exec(count_statement).one()
+    if (count == 0) & (employee_check_cnt == 0):
+        employee = employee_crud.create_employee(session,
+            employee_in=employee_in,
+            user_id=current_user.id,
+            business_id=employee_in.business_id)
+    else:
+        raise HTTPException(status_code=400, detail="Not enough permissions or you are already registered as employee")
+    return employee
+
+@router.post("/admin/", response_model=EmployeePublic)
+def create_admin_employee_with_business(
+    session: SessionDep, current_user: CurrentUser, employee_in: EmployeeCreateAdmin
+) -> Any:
+    """
+    # Register as new employee by admin.
+    """
+    # check user if it exists as employee
+    statement_check_empl = (
+        select(func.count())
+        .select_from(Employee)
+        .where(Employee.user_id == employee_in.user_id)
+    )
+    employee_check_cnt = session.exec(statement_check_empl).one()
+    
+    if employee_check_cnt > 0:
+        raise HTTPException(status_code=400, detail="User is already registered as employee")
+    
     if not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Not enough permissions")
+    
     employee = employee_crud.create_employee(session,
         employee_in=employee_in,
-        user_id=current_user.id,
+        user_id=employee_in.user_id,
         business_id=employee_in.business_id)
     return employee
 
@@ -112,18 +146,20 @@ def invite_employee(email: str, business_id: uuid.UUID, session: SessionDep, cur
     """
     Invite employee to Business
     """
-    associated_auth, associated_employee_auth = check_if_user_is_associetes_with_business(session, current_user.id, business_id)
-    user = user_crud.get_user_by_email(session=session, email=email)
-    business = business_crud.get(session, business_id)
-    # Checks
+    # Get business
+    business = session.get(Business, business_id)
     if not business:
-        raise HTTPException(
-            status_code=404,
-            detail="The Company with this id not founded",
-        )
+        raise HTTPException(status_code=404, detail="Business not found")
+    # Get registered business
+    accessed_business_current = retrieve_businesses_by_user_id(session, current_user.id)
+    if not current_user.is_superuser and (business.id != accessed_business_current.id):
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    
+    # Get user to whom current user sending invite
+    user = user_crud.get_user_by_email(session=session, email=email)
     if user:
-        associated, associated_employee = check_if_user_is_associetes_with_business(session, user.id, business_id)
-        if associated:
+        accessed_business_invit = retrieve_businesses_by_user_id(session, user.id)
+        if accessed_business_invit:
             raise HTTPException(
                 status_code=400,
                 detail="The user with this email already registered in your Company",
@@ -163,6 +199,26 @@ def register_new_user_employee(session: SessionDep, body: NewInvite) -> Message:
             raise HTTPException(status_code=400, detail="Inactive user")
     # create employee for user
     employee = employee_crud.create_employee(session=session, employee_in=body.new_employee, user_id=user.id, business_id=invite.business_id)
+    return Message(message="You registered as member of team successfully. Please signin to system")
+
+@router.post("/create-by-invitation/")
+def register_employee_inv(session: SessionDep, current_user: CurrentUser, body: NewRegInvite) -> Message:
+    """
+    Register employee using invitation
+    """
+    # verify invitation
+    invite = verify_invite_token(token=body.token)
+    if not invite:
+        raise HTTPException(status_code=400, detail="Invalid token")
+    # verify if user exists if not create one
+    
+    if invite.email!=current_user.email:
+        raise HTTPException(status_code=400, detail="Access denied")
+    
+    if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    # create employee for user
+    employee = employee_crud.create_employee(session=session, employee_in=body.new_employee, user_id=current_user.id, business_id=invite.business_id)
     return Message(message="You registered as member of team successfully. Please signin to system")
 
 @router.put("/{id}", response_model=EmployeePublic)

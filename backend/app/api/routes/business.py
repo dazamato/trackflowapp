@@ -22,14 +22,16 @@ router = APIRouter()
 
 
 @router.get("/", response_model=BusinessesPublic)
-def read_my_businesses(
-    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
+def read_my_business(
+    session: SessionDep, current_user: CurrentUser
 ) -> Any:
     """
     Retrieve businesses by user.
     """
-    businesses = retrieve_businesses_by_user_id(session, current_user.id)
-    return businesses
+    business = retrieve_businesses_by_user_id(session, current_user.id)
+    if not business:
+        raise HTTPException(status_code=404, detail="User not registered as employee in any Business")
+    return business
 
 
 @router.get("/by_id/{id}", response_model=BusinessPublic)
@@ -40,8 +42,6 @@ def read_business(session: SessionDep, current_user: CurrentUser, id: uuid.UUID)
     business = session.get(Business, id)
     if not business:
         raise HTTPException(status_code=404, detail="Business not found")
-    if not current_user.is_superuser and (business.account_creator_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     return business
 
 @router.get("/all/", response_model=BusinessesPublic)
@@ -51,49 +51,21 @@ def read_all_businesses(
     """
     Retrieve businesses.
     """
-    # if current_user.is_superuser:
     count_statement = select(func.count()).select_from(Business)
     count = session.exec(count_statement).one()
     statement = select(Business).offset(skip).limit(limit)
     businesses = session.exec(statement).all()
     return BusinessesPublic(data=businesses, count=count)
 
-@router.get("/created_by_me/", response_model=BusinessesPublic)
-def read_created_businesses(
-    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
-) -> Any:
-    """
-    Retrieve businesses.
-    """
-    count_statement = (
-        select(func.count())
-        .select_from(Business)
-        .where(Business.account_creator_id == current_user.id)
-    )
-    count = session.exec(count_statement).one()
-    statement = (
-        select(Business)
-        .where(Business.account_creator_id == current_user.id)
-        .offset(skip)
-        .limit(limit)
-    )
-    businesses = session.exec(statement).all()
-
-    return BusinessesPublic(data=businesses, count=count)
 
 @router.post("/", response_model=BusinessPublic)
 def create_business_with_industry(
-    *, session: SessionDep, current_user: CurrentUser, business_in: BusinessCreate, employee_in: EmployeeCreate
+    *, session: SessionDep, current_user: CurrentUser, business_in: BusinessCreate
 ) -> Any:
     """
     Create new business.
     """
-    business = business_crud.create_business(session, business_in=business_in, account_creator_id=current_user.id
-        , business_industry_id=business_in.business_industry_id)
-    if not current_user.is_superuser:
-        employee = employee_crud.create_employee(session, employee_in=employee_in, user_id=current_user.id, business_id=business.id)
-    else:
-        pass
+    business = business_crud.create_business(session, business_in=business_in, business_industry_id=business_in.business_industry_id)
     return business
 
 @router.post("/without_industry/", response_model=BusinessPublic)
@@ -103,8 +75,7 @@ def create_business_without_industry(
     """
     Create new business.
     """
-    business = business_crud.create_business(session, business_in=business_in, account_creator_id=current_user.id
-        , business_industry_id=None)
+    business = business_crud.create_business(session, business_in=business_in, business_industry_id=None)
     return business
 
 
@@ -120,9 +91,10 @@ def update_business(
     Update an business.
     """
     business = session.get(Business, id)
+    business_accessed = retrieve_businesses_by_user_id(session, current_user.id)
     if not business:
         raise HTTPException(status_code=404, detail="Business not found")
-    if not current_user.is_superuser and (business.account_creator_id != current_user.id):
+    if not current_user.is_superuser and (business.id != business_accessed.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     update_dict = business_in.model_dump(exclude_unset=True)
     business.sqlmodel_update(update_dict)
@@ -140,9 +112,11 @@ def delete_business(
     Delete an business.
     """
     business = session.get(Business, id)
+    business_accessed = retrieve_businesses_by_user_id(session, current_user.id)
+    
     if not business:
         raise HTTPException(status_code=404, detail="Business not found")
-    if not current_user.is_superuser and (business.account_creator_id != current_user.id):
+    if not current_user.is_superuser and (business.id != business_accessed.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     session.delete(business)
     session.commit()

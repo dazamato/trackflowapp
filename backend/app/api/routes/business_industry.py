@@ -13,33 +13,16 @@ router = APIRouter()
 
 
 @router.get("/", response_model=BusinessIndustriesPublic)
-def read_business_industrys_self(
+def read_business_industrys(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
     Retrieve business_industrys.
     """
-
-    if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(BusinessIndustry)
-        count = session.exec(count_statement).one()
-        statement = select(BusinessIndustry).offset(skip).limit(limit)
-        business_industrys = session.exec(statement).all()
-    else:
-        count_statement = (
-            select(func.count())
-            .select_from(BusinessIndustry)
-            .where(BusinessIndustry.creator_id == current_user.id)
-        )
-        count = session.exec(count_statement).one()
-        statement = (
-            select(BusinessIndustry)
-            .where(BusinessIndustry.creator_id == current_user.id)
-            .offset(skip)
-            .limit(limit)
-        )
-        business_industrys = session.exec(statement).all()
-
+    count_statement = select(func.count()).select_from(BusinessIndustry)
+    count = session.exec(count_statement).one()
+    statement = select(BusinessIndustry).offset(skip).limit(limit)
+    business_industrys = session.exec(statement).all()
     return BusinessIndustriesPublic(data=business_industrys, count=count)
 
 
@@ -51,8 +34,6 @@ def read_business_industry(session: SessionDep, current_user: CurrentUser, id: u
     business_industry = session.get(BusinessIndustry, id)
     if not business_industry:
         raise HTTPException(status_code=404, detail="BusinessIndustry not found")
-    if not current_user.is_superuser and (business_industry.creator_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     return business_industry
 
 
@@ -63,11 +44,7 @@ def create_business_industry(
     """
     Create new business_industry.
     """
-    business_industry = business_industry_crud.create_business_industry(session, business_industry_in, current_user.id)
-    # business_industry = BusinessIndustry.model_validate(business_industry_in, update={"creator_id": current_user.id})
-    # session.add(business_industry)
-    # session.commit()
-    # session.refresh(business_industry)
+    business_industry = business_industry_crud.create_business_industry(session, business_industry_in)
     return business_industry
 
 
@@ -85,7 +62,7 @@ def update_business_industry(
     business_industry = session.get(BusinessIndustry, id)
     if not business_industry:
         raise HTTPException(status_code=404, detail="BusinessIndustry not found")
-    if not current_user.is_superuser and (business_industry.creator_id != current_user.id):
+    if not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     update_dict = business_industry_in.model_dump(exclude_unset=True)
     business_industry.sqlmodel_update(update_dict)
@@ -105,7 +82,7 @@ def delete_business_industry(
     business_industry = session.get(BusinessIndustry, id)
     if not business_industry:
         raise HTTPException(status_code=404, detail="BusinessIndustry not found")
-    if not current_user.is_superuser and (business_industry.creator_id != current_user.id):
+    if not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     session.delete(business_industry)
     session.commit()
