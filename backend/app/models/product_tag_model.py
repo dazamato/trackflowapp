@@ -1,5 +1,6 @@
 import uuid
 from pydantic import EmailStr
+from typing import Optional, List, Any
 from app.models.base import Field, Relationship, SQLModel
 from app.models.product_tag_link_model import ProductTagLink
 from datetime import datetime
@@ -14,6 +15,7 @@ class ProductTagBase(SQLModel):
 # Properties to receive on product tag creation
 class ProductTagCreate(ProductTagBase):
     pass
+    # product_id: uuid.UUID
 
 
 # Properties to receive on product tag update
@@ -33,7 +35,10 @@ class ProductTag(ProductTagBase, table=True):
 # Properties to return via API, id is always required
 class ProductTagPublic(ProductTagBase):
     id: uuid.UUID
-    creator_id: uuid.UUID
+    
+class ProductTagPublicDetail(ProductTagBase):
+    id: uuid.UUID
+    products: list[Any]
 
 
 class ProductTagsPublic(SQLModel):

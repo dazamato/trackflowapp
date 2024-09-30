@@ -24,35 +24,6 @@ def read_product_groups(
     product_groups = session.exec(statement).all()
     return ProductGroupsPublic(data=product_groups, count=count)
 
-@router.get("/self/", response_model=ProductGroupsPublic)
-def read_product_groups_self(
-    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
-) -> Any:
-    """
-    Retrieve product_groups.
-    """
-
-    if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(ProductGroup)
-        count = session.exec(count_statement).one()
-        statement = select(ProductGroup).offset(skip).limit(limit)
-        product_groups = session.exec(statement).all()
-    else:
-        count_statement = (
-            select(func.count())
-            .select_from(ProductGroup)
-            .where(ProductGroup.creator_id == current_user.id)
-        )
-        count = session.exec(count_statement).one()
-        statement = (
-            select(ProductGroup)
-            .where(ProductGroup.creator_id == current_user.id)
-            .offset(skip)
-            .limit(limit)
-        )
-        product_groups = session.exec(statement).all()
-
-    return ProductGroupsPublic(data=product_groups, count=count)
 
 @router.get("/{id}", response_model=ProductGroupPublic)
 def read_product_group(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
@@ -62,8 +33,6 @@ def read_product_group(session: SessionDep, current_user: CurrentUser, id: uuid.
     product_group = session.get(ProductGroup, id)
     if not product_group:
         raise HTTPException(status_code=404, detail="ProductGroup not found")
-    # if not current_user.is_superuser and (product_group.creator_id != current_user.id):
-    #     raise HTTPException(status_code=400, detail="Not enough permissions")
     return product_group
 
 
@@ -74,7 +43,7 @@ def create_product_group(
     """
     Create new product_group.
     """
-    product_group = product_group_crud.create_product_group(session, product_group_in, current_user.id)
+    product_group = product_group_crud.create_product_group(session, product_group_in)
     return product_group
 
 
@@ -92,7 +61,7 @@ def update_product_group(
     product_group = session.get(ProductGroup, id)
     if not product_group:
         raise HTTPException(status_code=404, detail="ProductGroup not found")
-    if not current_user.is_superuser and (product_group.creator_id != current_user.id):
+    if not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     update_dict = product_group_in.model_dump(exclude_unset=True)
     product_group.sqlmodel_update(update_dict)
@@ -112,7 +81,7 @@ def delete_product_group(
     product_group = session.get(ProductGroup, id)
     if not product_group:
         raise HTTPException(status_code=404, detail="ProductGroup not found")
-    if not current_user.is_superuser and (product_group.creator_id != current_user.id):
+    if not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     session.delete(product_group)
     session.commit()

@@ -9,8 +9,8 @@ from app.backend_pre_start import logger
 
 
 class CRUDProductGroup(CRUDBase[ProductGroup, ProductGroupCreate, ProductGroupUpdate]):
-    def create_product_group(self, session: Session, product_group_in: ProductGroupCreate, creator_id: uuid.UUID) -> ProductGroup:
-        db_item = ProductGroup.model_validate(product_group_in, update={"creator_id": creator_id})
+    def create_product_group(self, session: Session, product_group_in: ProductGroupCreate) -> ProductGroup:
+        db_item = ProductGroup.model_validate(product_group_in)
         session.add(db_item)
         session.commit()
         session.refresh(db_item)

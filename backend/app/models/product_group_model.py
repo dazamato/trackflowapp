@@ -17,13 +17,15 @@ class ProductGroupCreate(ProductGroupBase):
 
 # Properties to receive on product group update
 class ProductGroupUpdate(ProductGroupBase):
-    title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    title: str | None = Field(default=None, min_length=1, max_length=255)
+    validated: bool | None = Field(default=False, max_length=255) # type: ignore
 
 
 # Database model, database table inferred from class name
 class ProductGroup(ProductGroupBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     title: str = Field(max_length=255)
+    validated: bool | None = Field(default=False, max_length=255)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
     products: list['Product'] | None = Relationship(back_populates="group")
