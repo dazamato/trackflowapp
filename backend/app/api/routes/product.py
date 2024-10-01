@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-@router.get("/by_product_group/", response_model=ProductsPublic)
-def read_products_group(
+@router.get("/", response_model=ProductsPublic)
+def read_products_all_public_by_group(
     session: SessionDep, current_user: CurrentUser, product_group_id: uuid.UUID, skip: int = 0, limit: int = 100
 ) -> Any:
     """
@@ -36,8 +36,36 @@ def read_products_group(
     business = retrieve_businesses_by_user_id(session, current_user.id)
     if not current_user.is_superuser and (not business):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    
-    products = retrieve_products_by_business_id(session=session, business_id=business.id, product_group_id=product_group_id)
+    # TODO add moderation functionality
+    products_all = session.exec(select(Product).where((Product.product_group_id == product_group_id)
+                                                    #   & (Product.moderated == True)
+                                                      )).all()
+    count = len(products_all)
+    products = ProductsPublic(data=products_all, count=count)
+    return products
+
+@router.get("/by_product_group_with_created_items/", response_model=ProductsPublic)
+def read_products_group(
+    session: SessionDep, current_user: CurrentUser, product_group_id: uuid.UUID, skip: int = 0, limit: int = 100
+) -> Any:
+    """
+    Retrieve products of product_group with created items.
+    """
+    # Get product_group
+    product_group = session.get(ProductGroup, product_group_id)
+    if not product_group:
+        raise HTTPException(status_code=404, detail="Product group not found")
+
+    # check if current_user has employee
+    business = retrieve_businesses_by_user_id(session, current_user.id)
+    if not current_user.is_superuser and (not business):
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    if not current_user.is_superuser:
+        products = retrieve_products_by_business_id(session=session, business_id=business.id, product_group_id=product_group_id)
+    else:
+        products_all = session.exec(select(Product).where(Product.product_group_id == product_group_id)).all()
+        count = len(products_all)
+        products = ProductsPublic(data=products_all, count=count)
 
     return products
 
@@ -108,9 +136,11 @@ def add_product_tag_link_to_product(
     # Check if current_user has permission to add tag to product
     business = retrieve_businesses_by_user_id(session, current_user.id)
     if not current_user.is_superuser and (not business):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+        raise HTTPException(status_code=400, detail="Not enough permissions, you not in any")
     
     existing_products = retrieve_products_by_business_id(session=session, business_id=business.id)
+    # TODO retrieve products by business takes only that products that have items associated to business in which user is employee. There is product is not in that list, then user does not have permission to add tag to that product
+    # NEED to fix that
     # check if product is in existing_products
     filtered_existing_products = [e for e in existing_products.data if e.id == product_tag_link.product_id]
     if len(filtered_existing_products) == 0:

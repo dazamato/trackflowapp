@@ -91,12 +91,12 @@ def retrieve_products_by_business_id(session: SessionDep, business_id: uuid.UUID
         count_statement = (
             select(func.count())
             .select_from(Product)
-            .where(Product.id.in_([item.product_id for item in items]))
+            .where(Product.id.in_([item.product_id for item in items]) & Product.product_group_id==product_group_id)
         )
         count = session.exec(count_statement).one()
         statement = (
             select(Product)
-            .where(Product.id.in_([item.product_id for item in items]))
+            .where(Product.id.in_([item.product_id for item in items]) & Product.product_group_id==product_group_id)
         )
         products = session.exec(statement).all()
     else:
@@ -112,12 +112,12 @@ def retrieve_products_by_business_id(session: SessionDep, business_id: uuid.UUID
         count_statement = (
             select(func.count())
             .select_from(Product)
-            .where(Product.id.in_([item.product_id for item in items]) & Product.product_group_id==product_group_id)
+            .where(Product.id.in_([item.product_id for item in items]))
         )
         count = session.exec(count_statement).one()
         statement = (
             select(Product)
-            .where(Product.id.in_([item.product_id for item in items]) & Product.product_group_id==product_group_id)
+            .where(Product.id.in_([item.product_id for item in items]))
         )
         products = session.exec(statement).all()
         

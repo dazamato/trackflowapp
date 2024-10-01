@@ -13,11 +13,11 @@ router = APIRouter()
 
 
 @router.get("/", response_model=ItemsPublic)
-def read_all_items(
+def read_items_of_business(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
-    Retrieve items.
+    Retrieve items of business.
     """
     # get business in which user is registered as employee
     business = retrieve_businesses_by_user_id(session, current_user.id)
@@ -26,25 +26,21 @@ def read_all_items(
             status_code=404,
             detail="User is not registered in any business.",
         )
-    if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(Item)
-        count = session.exec(count_statement).one()
-        statement = select(Item).offset(skip).limit(limit)
-        items = session.exec(statement).all()
-    else:
-        count_statement = (
-            select(func.count())
-            .select_from(Item)
-            .where(Item.owner_id == business.id)
-        )
-        count = session.exec(count_statement).one()
-        statement = (
-            select(Item)
-            .where(Item.owner_id == business.id)
-            .offset(skip)
-            .limit(limit)
-        )
-        items = session.exec(statement).all()
+
+
+    count_statement = (
+        select(func.count())
+        .select_from(Item)
+        .where(Item.business_id == business.id)
+    )
+    count = session.exec(count_statement).one()
+    statement = (
+        select(Item)
+        .where(Item.business_id == business.id)
+        .offset(skip)
+        .limit(limit)
+    )
+    items = session.exec(statement).all()
 
     return ItemsPublic(data=items, count=count)
 
@@ -66,12 +62,12 @@ def read_products_items(
     count_statement = (
         select(func.count())
         .select_from(Item)
-        .where((Item.owner_id == business.id) & (Item.product_id == product_id))
+        .where((Item.business_id == business.id) & (Item.product_id == product_id))
     )
     count = session.exec(count_statement).one()
     statement = (
         select(Item)
-        .where((Item.owner_id == business.id) & (Item.product_id == product_id))
+        .where((Item.business_id == business.id) & (Item.product_id == product_id))
         .offset(skip)
         .limit(limit)
     )
@@ -94,7 +90,7 @@ def read_item(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> 
             detail="User is not registered in any business.",
         )
     else:
-        if not current_user.is_superuser and (item.owner_id != business.id):
+        if not current_user.is_superuser and (item.business_id != business.id):
             raise HTTPException(status_code=400, detail="Not enough permissions")
     return item
 
@@ -136,7 +132,7 @@ def update_item(
             status_code=404,
             detail="User is not registered in any business.",
         )
-    if not current_user.is_superuser and (item.owner_id != business.id):
+    if not current_user.is_superuser and (item.business_id != business.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     update_dict = item_in.model_dump(exclude_unset=True)
     item.sqlmodel_update(update_dict)
@@ -162,7 +158,7 @@ def delete_item(
             status_code=404,
             detail="User is not registered in any business.",
         )
-    if not current_user.is_superuser and (item.owner_id != business.id):
+    if not current_user.is_superuser and (item.business_id != business.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     session.delete(item)
     session.commit()

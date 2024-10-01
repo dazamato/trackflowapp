@@ -27,7 +27,7 @@ class ProductUpdate(ProductBase):
     description: str | None = Field(default=None, max_length=255)
     sku: str | None = Field(default=None, min_length=1, max_length=255)
     product_group_id: uuid.UUID | None = Field(default=None)
-    moderated: bool| None = Field(default=None, min_length=1, max_length=255)
+    moderated: bool| None = Field(default=False, min_length=1, max_length=255)
     tags: list[ProductTag] | None = Field(default=[])
 
 # Database model, database table inferred from class name
@@ -49,7 +49,6 @@ class Product(ProductBase, table=True):
 # Properties to return via API, id is always required
 class ProductPublic(ProductBase):
     id: uuid.UUID
-    creator_id: uuid.UUID
     product_group_id: uuid.UUID
     image: str | None
     tags: list[ProductTag]

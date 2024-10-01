@@ -13,6 +13,9 @@ class ItemBase(SQLModel):
     description: str | None = Field(default=None, max_length=255)
     price: Optional[float] = None
     cost_price: Optional[float] = None
+    quantity: Optional[int] = None
+    supplier: str | None = Field(default=None, max_length=255)
+    img: str | None = Field(default=None, max_length=255)
 
 
 
@@ -45,7 +48,7 @@ class Item(ItemBase, table=True):
 # Properties to return via API, id is always required
 class ItemPublic(ItemBase):
     id: uuid.UUID
-    owner_id: uuid.UUID
+    business_id: uuid.UUID
     product_id: uuid.UUID
 
 

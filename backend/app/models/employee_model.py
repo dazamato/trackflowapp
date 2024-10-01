@@ -12,7 +12,6 @@ class EmployeeBase(SQLModel):
     name: str = Field(index=True, min_length=1, max_length=255)
     description: Optional[str] = Field(default=None, max_length=255)
     role: Optional[str] = Field(default=None, max_length=100)
-    is_active: bool = Field(default=True)
 
 # Properties to receive on employee creation
 class EmployeeCreate(EmployeeBase):
@@ -27,7 +26,7 @@ class EmployeeUpdate(SQLModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=255)
     description: Optional[str] = Field(default=None, max_length=255)
     role: Optional[str] = Field(default=None, max_length=100)
-    is_active: Optional[bool] = None
+    is_active: Optional[bool] = Field(default=True)
     business_id: Optional[int] = None
 
 class UserShow(SQLModel):
@@ -37,6 +36,7 @@ class UserShow(SQLModel):
 # Database model, database table inferred from class name
 class Employee(EmployeeBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    is_active: bool = Field(default=True)
     user_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )

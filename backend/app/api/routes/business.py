@@ -13,6 +13,7 @@ from app.models.base import Message
 from app.crud.crud_business import business_crud
 from app.crud.crud_employee import employee_crud
 import logging
+from fastapi.encoders import jsonable_encoder
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ router = APIRouter()
 
 
 
-@router.get("/", response_model=BusinessesPublic)
+@router.get("/", response_model=BusinessPublic)
 def read_my_business(
     session: SessionDep, current_user: CurrentUser
 ) -> Any:
@@ -65,7 +66,17 @@ def create_business_with_industry(
     """
     Create new business.
     """
-    business = business_crud.create_business(session, business_in=business_in, business_industry_id=business_in.business_industry_id)
+    if current_user.is_superuser:
+        business = business_crud.create_business(session, business_in=business_in, business_industry_id=business_in.business_industry_id)
+    else:
+        business_existing = retrieve_businesses_by_user_id(session, current_user.id)
+        if business_existing:
+            raise HTTPException(status_code=400, detail="User is already registered in a business")
+        business = business_crud.create_business(session, business_in=business_in, business_industry_id=business_in.business_industry_id)
+        obj_in_data = jsonable_encoder(business_in.employee_in)
+        obj_in_data["business_id"] = business.id
+        employee_in = EmployeeCreate(**obj_in_data)
+        employee_crud.create_employee(session, employee_in=employee_in, business_id=business.id, user_id=current_user.id)
     return business
 
 @router.post("/without_industry/", response_model=BusinessPublic)

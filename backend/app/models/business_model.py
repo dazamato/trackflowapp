@@ -19,10 +19,16 @@ class BusinessBase(SQLModel):
     logo: Optional[str] = Field(default=None)
     is_active: bool = Field(default=True)
 
-
+class EmployeeIN(SQLModel):
+    name: str = Field(index=True, min_length=1, max_length=255)
+    description: Optional[str] = Field(default=None, max_length=255)
+    role: Optional[str] = Field(default=None, max_length=100)
+    
+    
 # Properties to receive on business creation
 class BusinessCreate(BusinessBase):
     business_industry_id: Optional[uuid.UUID]
+    employee_in: EmployeeIN
 
 class BusinessCreateSolo(BusinessBase):
     pass
