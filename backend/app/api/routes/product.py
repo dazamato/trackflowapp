@@ -142,14 +142,17 @@ def add_product_tag_link_to_product(
     # TODO retrieve products by business takes only that products that have items associated to business in which user is employee. There is product is not in that list, then user does not have permission to add tag to that product
     # NEED to fix that
     # check if product is in existing_products
+    logger.info(f"existing_products: {existing_products}")
     filtered_existing_products = [e for e in existing_products.data if e.id == product_tag_link.product_id]
-    if len(filtered_existing_products) == 0:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
-    
+    # if len(filtered_existing_products) > 0:
+    #     raise HTTPException(status_code=400, detail="Product already has this tag")
     
     product_tag = session.get(ProductTag, product_tag_link.product_tag_id)
     if not product_tag:
         raise HTTPException(status_code=404, detail="ProductTag not found")
+    
+    if product_tag.id in [t.id for t in product.tags]:
+        raise HTTPException(status_code=400, detail="Product already has this tag")
     
     # Saving product_tag_link and updating product
     logger.info(f"product_tag: {product_tag}")
