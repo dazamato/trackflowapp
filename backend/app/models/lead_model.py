@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy.sql import func
 from app.models.business_model import Business
 from app.models.proposal_model import Proposal
+from app.models.address_model import Address
 
 # Shared properties
 class LeadBase(SQLModel):
@@ -38,6 +39,7 @@ class Lead(LeadBase, table=True):
     business: Business | None = Relationship()
     sale_id: uuid.UUID | None = Field(default=None)
     proposals: list[Proposal] = Relationship(back_populates="lead")
+    addresses: list[Address] = Relationship(back_populates="lead")
 
 
 # Properties to return via API, id is always required

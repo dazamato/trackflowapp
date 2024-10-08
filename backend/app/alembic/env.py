@@ -29,7 +29,7 @@ from app.models.product_tag_link_model import ProductTagLink
 from app.models.sale_model import Sale
 from app.models.proposal_model import Proposal
 from app.models.lead_model import Lead
-
+from app.models.address_model import Address
 from app.models.base import Message, Token, TokenPayload, NewPassword
 
 target_metadata = SQLModel.metadata

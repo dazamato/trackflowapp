@@ -43,6 +43,7 @@ class Item(ItemBase, table=True):
         foreign_key="product.id", nullable=False
     )
     product: Product | None = Relationship(back_populates="items")
+    sales: list['Sale'] = Relationship(back_populates="item")
 
 
 # Properties to return via API, id is always required
