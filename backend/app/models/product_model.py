@@ -41,9 +41,9 @@ class Product(ProductBase, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
     group: ProductGroup | None = Relationship(back_populates="products")
-    items: list["Item"] | None = Relationship(back_populates="product")
+    items: list["Item"] | None = Relationship(back_populates="product") # type: ignore
     tags: list[ProductTag] = Relationship(back_populates="products", link_model=ProductTagLink)
-    proposals: list["Proposal"] | None = Relationship(back_populates="product")
+    proposals: list["Proposal"] | None = Relationship(back_populates="product") # type: ignore
 
 
 

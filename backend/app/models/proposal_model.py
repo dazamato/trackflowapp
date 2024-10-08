@@ -36,8 +36,8 @@ class Proposal(ProposalBase, table=True):
     product_id: uuid.UUID = Field(
         foreign_key="product.id", nullable=False
     )
-    product: "Product" = Relationship(back_populates="proposals")
-    lead: "Lead" = Relationship(back_populates="proposals")
+    product: "Product" = Relationship(back_populates="proposals") # type: ignore
+    lead: "Lead" = Relationship(back_populates="proposals") # type: ignore
     
 class ProductShow(SQLModel):
     title: str
