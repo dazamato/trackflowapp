@@ -17,8 +17,8 @@ interface SidebarItemsProps {
 
 const SidebarItems = ({ onClose }: SidebarItemsProps) => {
   const queryClient = useQueryClient()
-  const textColor = useColorModeValue("ui.main", "ui.light")
-  const bgActive = useColorModeValue("#E2E8F0", "#4A5568")
+  const textColor = useColorModeValue("black", "ui.light")
+  const bgActive = useColorModeValue("#DF7861", "#4A5568")
   const currentUser = queryClient.getQueryData<UserPublic>(["currentUser"])
 
   const finalItems = currentUser?.is_superuser

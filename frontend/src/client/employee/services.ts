@@ -1,6 +1,6 @@
-import type { CancelablePromise } from "./core/CancelablePromise"
-import { OpenAPI } from "./core/OpenAPI"
-import { request as __request } from "./core/request"
+import type { CancelablePromise } from "../core/CancelablePromise"
+import { OpenAPI } from "../core/OpenAPI"
+import { request as __request } from "../core/request"
 
 import type {
   Body_login_login_access_token,
@@ -18,7 +18,7 @@ import type {
   ItemPublic,
   ItemsPublic,
   ItemUpdate,
-} from "./models"
+} from "../user/models"
 
 export type TDataLoginAccessToken = {
   formData: Body_login_login_access_token

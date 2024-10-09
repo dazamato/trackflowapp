@@ -27,7 +27,7 @@ class EmployeeUpdate(SQLModel):
     description: Optional[str] = Field(default=None, max_length=255)
     role: Optional[str] = Field(default=None, max_length=100)
     is_active: Optional[bool] = Field(default=True)
-    business_id: Optional[int] = None
+    business_id: Optional[uuid.UUID] = None
 
 class UserShow(SQLModel):
     email: EmailStr = Field(unique=True, index=True, max_length=255)

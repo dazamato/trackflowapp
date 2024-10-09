@@ -9,11 +9,11 @@ const disabledStyles = {
 const theme = extendTheme({
   colors: {
     ui: {
-      main: "#009688",
-      secondary: "#EDF2F7",
-      success: "#48BB78",
-      danger: "#E53E3E",
-      light: "#FAFAFA",
+      main: "#FCF8E8",
+      secondary: "#ECB390",
+      success: "#D4E2D4",
+      danger: "#DF7861",
+      light: "#DF7861",
       dark: "#1A202C",
       darkSlate: "#252D3D",
       dim: "#A0AEC0",
@@ -23,10 +23,10 @@ const theme = extendTheme({
     Button: {
       variants: {
         primary: {
-          backgroundColor: "ui.main",
+          backgroundColor: "ui.secondary",
           color: "ui.light",
           _hover: {
-            backgroundColor: "#00766C",
+            backgroundColor: "#D4E2D4",
           },
           _disabled: {
             ...disabledStyles,
@@ -49,7 +49,7 @@ const theme = extendTheme({
         enclosed: {
           tab: {
             _selected: {
-              color: "ui.main",
+              color: "ui.light",
             },
           },
         },
