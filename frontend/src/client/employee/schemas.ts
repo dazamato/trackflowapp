@@ -197,3 +197,33 @@ export const $EmployeesPublic = {
     },
   },
 } as const
+
+// export type NewInvite = {
+//   token: string
+//   new_user: Array<UserCreate>
+//   new_employee: Array<EmployeeCreateBusiness>
+// }
+
+export const $NewInvite = {
+  properties: {
+    token: {
+      type: "string",
+      isRequired: true,
+      maxLength: 255,
+    },
+    new_user: {
+      type: "array",
+      contains: {
+        type: "UserCreate",
+      },
+      isRequired: true,
+    },
+    new_employee: {
+      type: "array",
+      contains: {
+        type: "EmployeeCreateBusiness",
+      },
+      isRequired: true,
+    },
+  }
+}

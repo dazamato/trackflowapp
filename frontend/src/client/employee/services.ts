@@ -7,6 +7,7 @@ import type {
   EmployeePublic,
   EmployeesPublic,
   EmployeeUpdate,
+  NewInvite
 } from "../employee/models"
 import type { Message } from "../user/models"
 
@@ -14,6 +15,13 @@ export type TDataReadEmployees = {
   business_id: string
   limit?: number
   skip?: number
+}
+export type TDataCreateEmployeeUserByInvite = {
+  requestBody: NewInvite
+}
+export type TDataInvite ={
+  email: string
+  business_id: string
 }
 export type TDataCreateEmployee = {
   requestBody: EmployeeCreate
@@ -111,7 +119,46 @@ export class EmployeesService {
       },
     })
   }
-  // TODO finish the implementation of the service class of the EmployeesService
+  /**
+   * Invite New Employee and User using invitation letter
+   * @returns EmployeePublic Successful Response
+   * @throws ApiError
+   */
+
+  public static inviteEmployee(data: TDataInvite): CancelablePromise<Message> {
+    const { email, business_id } = data
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/v1/employee/invite_employee/{email}/{business_id}",
+      query: {
+        email,
+        business_id
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+  /**
+   * Create Employee and User using invitation letter
+   * Create new Employee.
+   * @returns EmployeePublic Successful Response
+   * @throws ApiError
+   */
+  public static RegisterNewUserEmployeeByInvite(
+    data: TDataCreateEmployeeUserByInvite,
+  ): CancelablePromise<Message> {
+    const { requestBody } = data
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/v1/employee/register-by-invitation/",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
 
   /**
    * Update Employee
@@ -125,7 +172,7 @@ export class EmployeesService {
     const { id, requestBody } = data
     return __request(OpenAPI, {
       method: "PUT",
-      url: "/api/v1/items/{id}",
+      url: "/api/v1/employee/{id}",
       path: {
         id,
       },
@@ -147,7 +194,7 @@ export class EmployeesService {
     const { id } = data
     return __request(OpenAPI, {
       method: "DELETE",
-      url: "/api/v1/items/{id}",
+      url: "/api/v1/employee/{id}",
       path: {
         id,
       },

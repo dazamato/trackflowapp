@@ -1,3 +1,5 @@
+import type {UserCreate} from '../user/models'
+
 export type EmployeeCreateBusiness = {
   name: string
   description?: string | null
@@ -34,4 +36,9 @@ export type EmployeeUpdate = {
 export type EmployeesPublic = {
   data: Array<EmployeePublic>
   count: number
+}
+export type NewInvite = {
+  token: string
+  new_user: Array<UserCreate>
+  new_employee: Array<EmployeeCreateBusiness>
 }

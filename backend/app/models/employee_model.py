@@ -61,29 +61,3 @@ class EmployeePublic(EmployeeBase):
 class EmployeesPublic(SQLModel):
     data: List[EmployeePublic]
     count: int
-
-
-
-# These are placeholder type hints. You should replace them with actual imports.
-# class User_model(SQLModel):
-#     pass
-
-# class Business_model(SQLModel):
-#     pass
-
-# This structure follows a similar pattern to the Item model you provided, with the following key components:
-
-# 1. `PrivateBase`: Contains shared properties.
-# 2. `PrivateCreate`: For creating new Private instances.
-# 3. `PrivateUpdate`: For updating existing Private instances.
-# 4. `Private`: The main database model.
-# 5. `PrivatePublic`: For returning Private data via API.
-# 6. `PrivatesPublic`: For returning multiple Private instances.
-
-# Note that I've made some assumptions:
-# - The `id` field uses UUID, similar to the Item model.
-# - I've kept the field names and types as you specified.
-# - I've added length constraints to string fields where appropriate.
-# - The `User_model` and `Business_model` are placeholder classes. You should replace these with your actual user and business model imports.
-
-# You may need to adjust some details based on your specific requirements and how your User and Business models are defined.
