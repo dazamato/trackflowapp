@@ -60,7 +60,7 @@ def read_all_businesses(
 
 
 @router.post("/", response_model=BusinessPublic)
-def create_business_with_industry(
+def create_business_with_industry_employee(
     *, session: SessionDep, current_user: CurrentUser, business_in: BusinessCreate
 ) -> Any:
     """

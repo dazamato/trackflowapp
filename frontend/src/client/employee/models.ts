@@ -1,3 +1,9 @@
+export type EmployeeCreateBusiness = {
+  name: string
+  description?: string | null
+  role?: string | null
+}
+
 export type EmployeeCreate = {
   name: string
   description?: string | null

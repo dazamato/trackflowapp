@@ -6,3 +6,6 @@ export type { OpenAPIConfig } from "./core/OpenAPI"
 export * from "./user/models"
 export * from "./user/schemas"
 export * from "./user/services"
+
+export * from "./employee/models"
+export * from "./employee/schemas"

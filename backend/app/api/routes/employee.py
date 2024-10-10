@@ -16,7 +16,7 @@ from app.utils import generate_invite_token, verify_invite_token, generate_invit
 router = APIRouter()
 
 @router.get("/", response_model=EmployeePublic)
-def read_my_employees(
+def read_employee_me(
     session: SessionDep, current_user: CurrentUser
 ) -> Any:
     """
