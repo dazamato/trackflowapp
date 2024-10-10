@@ -45,8 +45,8 @@ class Business(BusinessBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     business_industry_id: Optional[uuid.UUID] = Field(foreign_key="businessindustry.id", nullable=True)
     business_industry: BusinessIndustry | None = Relationship(back_populates="businesses")
-    employees: List["Employee"] = Relationship(back_populates="business")
-    items: List["Item"] = Relationship(back_populates="business")
+    employees: List["Employee"] = Relationship(back_populates="business") # type: ignore
+    items: List["Item"] = Relationship(back_populates="business") # type: ignore
     # leads: List["Lead"] = Relationship(back_populates="business")
 
 
