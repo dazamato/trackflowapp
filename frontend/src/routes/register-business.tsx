@@ -54,8 +54,8 @@ function BusinessIndustryDropdown() {
   const queryClient = useQueryClient()
   const {
     data: industries,
-    isPending,
-    isPlaceholderData,
+    // isPending,
+    // isPlaceholderData,
   } = useQuery({
     ...getIndustry(),
   })

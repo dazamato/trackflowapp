@@ -29,7 +29,7 @@ class BusinessIndustry(BusinessIndustryBase, table=True):
     title: str = Field(max_length=255)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow},)
-    businesses: List['Business'] | None = Relationship(back_populates="business_industry")
+    businesses: List['Business'] | None = Relationship(back_populates="business_industry") # type: ignore
 
 
 # Properties to return via API, id is always required
