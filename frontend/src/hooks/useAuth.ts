@@ -10,6 +10,7 @@ import {
   type UserPublic,
   type UserRegister,
   UsersService,
+  EmployeesService
 } from "../client"
 import useCustomToast from "./useCustomToast"
 
@@ -63,8 +64,15 @@ const useAuth = () => {
 
   const loginMutation = useMutation({
     mutationFn: login,
-    onSuccess: () => {
-      navigate({ to: "/" })
+    onSuccess: async () => {
+      try {
+        const employee = await EmployeesService.readEmployeeMe()
+        localStorage.setItem("employee_id", employee.id)
+        navigate({ to: "/" })
+      }
+      catch (err) {
+        navigate({ to: "/register-business" })
+      }
     },
     onError: (err: ApiError) => {
       let errDetail = (err.body as any)?.detail
@@ -83,6 +91,7 @@ const useAuth = () => {
 
   const logout = () => {
     localStorage.removeItem("access_token")
+    localStorage.removeItem("employee_id")
     navigate({ to: "/login" })
   }
 

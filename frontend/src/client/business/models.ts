@@ -14,6 +14,7 @@ export type BusinessCreate = {
   bank_account?: string | null
   logo?: string | null
   is_active?: boolean | null
+  business_industry_id: string | null
   employee_in: EmployeeCreateBusiness
 }
 

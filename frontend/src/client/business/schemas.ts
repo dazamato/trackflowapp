@@ -149,6 +149,18 @@ export const $BusinessCreate = {
         },
       ],
     },
+    business_industry_id: {
+      type: "any-of",
+      contains: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "null",
+        },
+      ],
+    },
     employee_in: {
       type: "object",
       properties: {
@@ -523,7 +535,7 @@ export const $BusinessesPublic = {
     data: {
       type: "array",
       contains: {
-        type: "EmployeePublic",
+        type: "BusinessPublic",
       },
       isRequired: true,
     },

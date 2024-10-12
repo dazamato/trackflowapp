@@ -16,6 +16,7 @@ from app.models.base import (
     Message
 )
 from app.models.item_model import Item
+from app.models.employee_model import Employee
 from app.models.user_model import (
     User,
     UserCreate,
@@ -137,7 +138,7 @@ def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
-    statement = delete(Item).where(col(Item.owner_id) == current_user.id)
+    statement = delete(Employee).where(col(Employee.user_id) == current_user.id)
     session.exec(statement)  # type: ignore
     session.delete(current_user)
     session.commit()
