@@ -17,19 +17,13 @@ import {
   
   import {
     type ApiError,
-    type UserPublic,
-    type BusinessPublic,
     type EmployeePublic,
-    type UserUpdateMe,
     type EmployeeUpdate,
-    UsersService,
-    BusinessesService,
     EmployeesService,
   } from "../../client"
-  import useAuth from "../../hooks/useAuth"
   import useEmployee from "../../hooks/useEmployee"
   import useCustomToast from "../../hooks/useCustomToast"
-  import { emailPattern, handleError } from "../../utils"
+  import { handleError } from "../../utils"
   
   const BusinessCabinet = () => {
     const queryClient = useQueryClient()
@@ -41,8 +35,8 @@ import {
       register,
       handleSubmit,
       reset,
-      getValues,
-      formState: { isSubmitting, errors, isDirty },
+      // getValues,
+      formState: { isSubmitting, errors },
     } = useForm<EmployeePublic>({
       mode: "onBlur",
       criteriaMode: "all",
