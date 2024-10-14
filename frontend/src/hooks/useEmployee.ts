@@ -61,7 +61,7 @@ const useEmployee = () => {
           showToast("Something went wrong.", errDetail, "error")
         },
         onSettled: () => {
-          queryClient.invalidateQueries({ queryKey: ["employee"] })
+          queryClient.invalidateQueries({ queryKey: ["currentEmployee"] })
         },
       })
 

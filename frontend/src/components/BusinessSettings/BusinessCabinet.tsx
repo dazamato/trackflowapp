@@ -96,6 +96,7 @@ import {
                   type="text"
                   size="md"
                   w="auto"
+                  defaultValue={currentEmployee?.name || "N/A"}
                 />
               ) : (
                 <Text
@@ -120,6 +121,7 @@ import {
                   type="text"
                   size="md"
                   w="auto"
+                  defaultValue={currentEmployee?.description || "N/A"}
                 />
               ) : (
                 <Text size="md" py={2} isTruncated maxWidth="250px">

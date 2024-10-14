@@ -65,6 +65,7 @@ export type UserPublic = {
   is_active?: boolean
   is_superuser?: boolean
   full_name?: string | null
+  employee?: object | null
   id: string
 }
 
