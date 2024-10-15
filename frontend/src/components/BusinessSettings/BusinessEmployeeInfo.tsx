@@ -25,7 +25,7 @@ import {
   import useCustomToast from "../../hooks/useCustomToast"
   import { handleError } from "../../utils"
   
-  const BusinessCabinet = () => {
+  const BusinessEmployeeInfo = () => {
     const queryClient = useQueryClient()
     const color = useColorModeValue("inherit", "ui.light")
     const showToast = useCustomToast()
@@ -154,5 +154,5 @@ import {
     )
   }
   
-  export default BusinessCabinet
+  export default BusinessEmployeeInfo
   

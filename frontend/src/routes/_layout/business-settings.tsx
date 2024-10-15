@@ -14,11 +14,12 @@ import {
 //   import Appearance from "../../components/BusinessSettings/Appearance"
 //   import ChangePassword from "../../components/BusinessSettings/ChangePassword"
 //   import DeleteAccount from "../../components/BusinessSettings/DeleteAccount"
-  import BusinessCabinet from "../../components/BusinessSettings/BusinessCabinet"
+  import BusinessEmployeeInfo from "../../components/BusinessSettings/BusinessEmployeeInfo"
+  import BusinessInfo from "../../components/BusinessSettings/BusinessInfo"
   
   const tabsConfig = [
-    { title: "My Position", component: BusinessCabinet },
-    // { title: "Password", component: ChangePassword },
+    { title: "My Position", component: BusinessEmployeeInfo },
+    { title: "Company information", component: BusinessInfo },
     // { title: "Appearance", component: Appearance },
     // { title: "Danger zone", component: DeleteAccount },
   ]
