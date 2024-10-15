@@ -30,6 +30,18 @@ export const $EmployeeCreateBusiness = {
         },
       ],
     },
+    avatar: {
+      type: "any-of",
+      contains: [
+        {
+          type: "string",
+          maxLength: 255,
+        },
+        {
+          type: "null",
+        },
+      ],
+    },
   },
 } as const
 
@@ -59,6 +71,18 @@ export const $EmployeeCreate = {
         {
           type: "string",
           maxLength: 100,
+        },
+        {
+          type: "null",
+        },
+      ],
+    },
+    avatar: {
+      type: "any-of",
+      contains: [
+        {
+          type: "string",
+          maxLength: 255,
         },
         {
           type: "null",
@@ -99,6 +123,18 @@ export const $EmployeePublic = {
         {
           type: "string",
           maxLength: 100,
+        },
+        {
+          type: "null",
+        },
+      ],
+    },
+    avatar: {
+      type: "any-of",
+      contains: [
+        {
+          type: "string",
+          maxLength: 255,
         },
         {
           type: "null",
@@ -160,6 +196,18 @@ export const $EmployeeUpdate = {
         {
           type: "string",
           maxLength: 100,
+        },
+        {
+          type: "null",
+        },
+      ],
+    },
+    avatar: {
+      type: "any-of",
+      contains: [
+        {
+          type: "string",
+          maxLength: 255,
         },
         {
           type: "null",

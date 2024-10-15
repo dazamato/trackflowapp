@@ -12,6 +12,7 @@ class EmployeeBase(SQLModel):
     name: str = Field(index=True, min_length=1, max_length=255)
     description: Optional[str] = Field(default=None, max_length=255)
     role: Optional[str] = Field(default=None, max_length=100)
+    avatar: Optional[str] = Field(default=None, max_length=255)
 
 # Properties to receive on employee creation
 class EmployeeCreate(EmployeeBase):
@@ -26,6 +27,7 @@ class EmployeeUpdate(SQLModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=255)
     description: Optional[str] = Field(default=None, max_length=255)
     role: Optional[str] = Field(default=None, max_length=100)
+    avatar: Optional[str] = Field(default=None, max_length=255)
     is_active: Optional[bool] = Field(default=True)
     business_id: Optional[uuid.UUID] = None
 

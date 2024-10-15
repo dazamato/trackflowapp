@@ -5,6 +5,7 @@ export type EmployeeCreateBusiness = {
   name: string
   description?: string | null
   role?: string | null
+  avatar?: string | null
 }
 
 export type EmployeeCreate = {
@@ -12,6 +13,7 @@ export type EmployeeCreate = {
   description?: string | null
   role?: string | null
   business_id: string
+  avatar?: string | null
 }
 
 export type EmployeePublic = {
@@ -19,6 +21,7 @@ export type EmployeePublic = {
   name: string
   description?: string | null
   role?: string | null
+  avatar?: string | null
   business_id: string
   is_active?: boolean
   user_id: string
@@ -31,6 +34,7 @@ export type EmployeeUpdate = {
   name?: string | null
   description?: string | null
   role?: string | null
+  avatar?: string | null
   business_id?: string | null
 }
 
