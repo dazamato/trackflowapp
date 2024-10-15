@@ -34,7 +34,6 @@ class Sale(SaleBase, table=True):
     item_id: uuid.UUID = Field(
         foreign_key="item.id", nullable=False, ondelete="CASCADE"
     )
-    item: Item = Relationship(back_populates="sales")
     @computed_field(description="sum of sale")
     @property
     def sum_of_sale(self) -> float:
