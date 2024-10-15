@@ -75,6 +75,7 @@ def create_business_with_industry_employee(
         business = business_crud.create_business(session, business_in=business_in, business_industry_id=business_in.business_industry_id)
         obj_in_data = jsonable_encoder(business_in.employee_in)
         obj_in_data["business_id"] = business.id
+        obj_in_data["role"] = "admin"
         employee_in = EmployeeCreate(**obj_in_data)
         employee_crud.create_employee(session, employee_in=employee_in, business_id=business.id, user_id=current_user.id)
     return business

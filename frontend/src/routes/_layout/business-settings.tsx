@@ -10,14 +10,14 @@ import {
   import { useQueryClient } from "@tanstack/react-query"
   import { createFileRoute } from "@tanstack/react-router"
   
-  import type { UserPublic } from "../../client"
+  import type { UserPublic, BusinessPublic } from "../../client"
 //   import Appearance from "../../components/BusinessSettings/Appearance"
 //   import ChangePassword from "../../components/BusinessSettings/ChangePassword"
 //   import DeleteAccount from "../../components/BusinessSettings/DeleteAccount"
   import BusinessCabinet from "../../components/BusinessSettings/BusinessCabinet"
   
   const tabsConfig = [
-    { title: "My Company", component: BusinessCabinet },
+    { title: "My Position", component: BusinessCabinet },
     // { title: "Password", component: ChangePassword },
     // { title: "Appearance", component: Appearance },
     // { title: "Danger zone", component: DeleteAccount },
@@ -30,6 +30,7 @@ import {
   function BusinessSettings() {
     const queryClient = useQueryClient()
     const currentUser = queryClient.getQueryData<UserPublic>(["currentUser"])
+    const currentBusiness = queryClient.getQueryData<BusinessPublic>(["currentBusiness"])
     const finalTabs = currentUser?.is_superuser
       ? tabsConfig.slice(0, 3)
       : tabsConfig
@@ -37,7 +38,7 @@ import {
     return (
       <Container maxW="full">
         <Heading size="lg" textAlign={{ base: "center", md: "left" }} py={12}>
-          Company Settings
+          {currentBusiness?.name} Company Settings
         </Heading>
         <Tabs variant="enclosed">
           <TabList>

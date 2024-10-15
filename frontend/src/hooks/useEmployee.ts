@@ -29,16 +29,19 @@ const useEmployee = () => {
       enabled: isEmployee(),
     })
     const setEmployee = (data: EmployeePublic) => {
-        localStorage.setItem("access_token", data.business_id)
+        localStorage.setItem("employee_id", data.id)
+        localStorage.setItem("business_id", data.business_id)
     }
     const unsetEmployee = () => {
-        localStorage.removeItem("access_token")
+        localStorage.removeItem("employee_id")
+        localStorage.removeItem("business_id")
         queryClient.invalidateQueries({ queryKey: ["currentEmployee"] })
     }
     const registerEmployee = async (data: BusinessCreate) => { 
-        console.log("data", data)
-        const employee_reg = await BusinessesService.createBusinessEmployee({ requestBody: data })
-        localStorage.setItem("employee_id", employee_reg.id)
+        const business = await BusinessesService.createBusinessEmployee({ requestBody: data })
+        localStorage.setItem("business_id", business.id)
+        const employee = await EmployeesService.readEmployeeMe()
+        localStorage.setItem("employee_id", employee.id)
     }
 
     const businessRegisterMutation = useMutation({

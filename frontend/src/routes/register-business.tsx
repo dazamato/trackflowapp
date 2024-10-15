@@ -165,46 +165,30 @@ function BusinessRegistration() {
 
           <FormControl id="employee_in.name" isInvalid={!!errors.employee_in?.name}>
             <FormLabel htmlFor="employee_in.name" srOnly>
-              Your Full Name
+              Your role name in Company
             </FormLabel>
             <Input
               id="employee_in.name"
               minLength={3}
-              {...register("employee_in.name", { required: "Your Full Name is required" })}
-              placeholder="Full Name"
+              {...register("employee_in.name", { required: "Your Your role name in Company" })}
+              placeholder="Your role name in Company"
               type="text"
             />
             {errors.employee_in?.name && (
               <FormErrorMessage>{errors.employee_in?.name?.message}</FormErrorMessage>
             )}
           </FormControl>
-
-          <FormControl id="employee_in.role" isInvalid={!!errors.employee_in?.role}>
-            <FormLabel htmlFor="employee_in.role" srOnly>
-              Role
-            </FormLabel>
-            <Input
-              id="employee_in.role"
-              minLength={3}
-              {...register("employee_in.role", { required: "Role is required" })}
-              placeholder="Role"
-              type="text"
-            />
-            {errors.employee_in?.role && (
-              <FormErrorMessage>{errors.employee_in?.role?.message}</FormErrorMessage>
-            )}
-          </FormControl>
           <FormControl id="email" isInvalid={!!errors.email}>
             <FormLabel htmlFor="email" srOnly>
-              Email
+              Your Business Email
             </FormLabel>
             <Input
               id="email"
               {...register("email", {
-                required: "Email is required",
+                required: "Business Email is required",
                 pattern: emailPattern,
               })}
-              placeholder="Email"
+              placeholder="Business Email"
               type="email"
             />
             {errors.email && (

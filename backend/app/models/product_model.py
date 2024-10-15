@@ -43,7 +43,6 @@ class Product(ProductBase, table=True):
     group: ProductGroup | None = Relationship(back_populates="products")
     items: list["Item"] | None = Relationship(back_populates="product") # type: ignore
     tags: list[ProductTag] = Relationship(back_populates="products", link_model=ProductTagLink)
-    proposals: list["Proposal"] | None = Relationship(back_populates="product") # type: ignore
 
 
 

@@ -1,4 +1,5 @@
 import type {UserCreate} from '../user/models'
+import type { BusinessPublic } from '../business/models'
 
 export type EmployeeCreateBusiness = {
   name: string
@@ -21,7 +22,7 @@ export type EmployeePublic = {
   business_id: string
   is_active?: boolean
   user_id: string
-  // business: Array<BusinessPublic>
+  business: Array<BusinessPublic>
   created_at: Date
   updated_at: Date
 }

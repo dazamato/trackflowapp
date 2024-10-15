@@ -78,7 +78,7 @@ import {
       <>
         <Container maxW="full">
           <Heading size="sm" py={4}>
-            Company Information
+            Employee Information
           </Heading>
           <Box
             w={{ sm: "full", md: "50%" }}
@@ -87,7 +87,7 @@ import {
           >
             <FormControl>
               <FormLabel color={color} htmlFor="name">
-                Full name of employee
+                Your role name in Company
               </FormLabel>
               {editMode ? (
                 <Input
@@ -112,7 +112,7 @@ import {
             </FormControl>
             <FormControl mt={4} isInvalid={!!errors.description}>
               <FormLabel color={color} htmlFor="description">
-                Description of employee
+                Main duties of employee
               </FormLabel>
               {editMode ? (
                 <Input

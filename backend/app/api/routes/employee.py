@@ -12,6 +12,7 @@ from app.crud.crud_employee import employee_crud
 from app.crud.crud_user import user_crud
 from app.crud.crud_business import business_crud
 from app.utils import generate_invite_token, verify_invite_token, generate_invite_to_business_email, send_email
+from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
 
@@ -198,8 +199,11 @@ def register_new_user_employee(session: SessionDep, body: NewInvite) -> Message:
         if not user.is_active:
             raise HTTPException(status_code=400, detail="Inactive user")
     # create employee for user
-    employee = employee_crud.create_employee(session=session, employee_in=body.new_employee, user_id=user.id, business_id=invite.business_id)
-    return Message(message="You registered as member of team successfully. Please signin to system")
+    obj_in_data = jsonable_encoder(body.new_employee)
+    obj_in_data["role"] = "undefined_employee"
+    business = business_crud.get(session, id = invite.business_id)
+    employee = employee_crud.create_employee(session=session, employee_in=obj_in_data, user_id=user.id, business_id=invite.business_id)
+    return Message(message=f"Thank you, {user.full_name}! You has registered as {employee.name} of {business.name} team successfully. Please signin to system")
 
 @router.post("/create-by-invitation/")
 def register_employee_inv(session: SessionDep, current_user: CurrentUser, body: NewRegInvite) -> Message:
