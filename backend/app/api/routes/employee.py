@@ -1,7 +1,9 @@
 from typing_extensions import Optional
 import uuid
 from typing import Any
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi.responses import FileResponse
+from pathlib import Path
 from sqlmodel import func, select
 from app.api.deps import CurrentUser, SessionDep, retrieve_businesses_by_user_id
 from app.models.employee_model import Employee, EmployeeCreate, EmployeeCreateAdmin, EmployeePublic, EmployeePublic, EmployeeUpdate, EmployeesPublic
@@ -13,7 +15,11 @@ from app.crud.crud_user import user_crud
 from app.crud.crud_business import business_crud
 from app.utils import generate_invite_token, verify_invite_token, generate_invite_to_business_email, send_email
 from fastapi.encoders import jsonable_encoder
+import os
+import logging
 
+
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.get("/", response_model=EmployeePublic)
@@ -249,6 +255,58 @@ def update_employee(
     session.refresh(employee)
     return employee
 
+@router.post("/update_avatar/", response_model=EmployeePublic)
+async def create_upload_file(
+    *,
+    file: UploadFile,
+    session: SessionDep,
+    current_user: CurrentUser):
+    
+    statement = (
+        select(Employee)
+        .where(Employee.user_id == current_user.id)
+    )
+    
+    employee = session.exec(statement).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="User not registered as employee")
+    
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
+    #  Ensure the directory exists
+    os.makedirs("/app/app/static/avatars", exist_ok=True)
+
+    # Save the avatar to the static files directory
+    avatar_path = f"/app/app/static/avatars/{uuid.uuid4()}.png"
+    logger.info(f"Saving avatar to {avatar_path}")
+    with open(avatar_path, "wb") as buffer:
+        buffer.write(file.file.read())
+    
+    employee.avatar = avatar_path
+    session.add(employee)
+    session.commit()
+    session.refresh(employee)
+    return employee
+
+@router.get("/get_avatar/")
+async def get_image(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser
+    ):
+    statement = (
+        select(Employee)
+        .where(Employee.user_id == current_user.id)
+    )
+    
+    employee = session.exec(statement).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="User not registered as employee")
+    
+    image_path = Path(employee.avatar)
+    if not image_path.is_file():
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(image_path)
 
 @router.delete("/{id}")
 def delete_employee(
