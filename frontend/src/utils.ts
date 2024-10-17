@@ -51,3 +51,25 @@ export const handleError = (err: ApiError, showToast: any) => {
   }
   showToast("Error", errorMessage, "error")
 }
+
+export const cacheImages = async (srcArray: string[]): Promise<void> => {
+  const promises = srcArray.map((src) => {
+    return new Promise<void>((resolve, reject) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => resolve();
+      img.onerror = () => reject();
+    });
+  });
+  await Promise.all(promises);
+  // setIsLoading(false);
+};
+
+export const cacheImage = async (src: string): Promise<void> => {
+  return new Promise<void>((resolve, reject) => {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => resolve();
+    img.onerror = () => reject();
+  });
+};

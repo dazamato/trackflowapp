@@ -18,7 +18,7 @@ import {
     type ApiError,
   } from "../../client"
 import useCustomToast from "../../hooks/useCustomToast"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { type SubmitHandler, useForm, FormProvider } from "react-hook-form"
 import { handleError } from "../../utils"
 
@@ -29,11 +29,8 @@ function EmployeeAvatarUpload(
     { employee }: { employee: EmployeePublic }) 
     {
     const showToast = useCustomToast()
-
     const queryClient = useQueryClient()
-    
     const [avatar, setAvatar] = useState("http://localhost/api/v1/employee/get_avatar/"+employee?.avatar)
-
     const formMethods = useForm<AvatarUploadInput>({
       mode: "onBlur",
       criteriaMode: "all"
@@ -73,6 +70,15 @@ function EmployeeAvatarUpload(
     const onSubmit: SubmitHandler<AvatarUploadInput> = async (data) => {
       mutation.mutate(data)
     }
+    useEffect(() => {      
+      if (employee) {
+        setAvatar("http://localhost/api/v1/employee/get_avatar/"+employee?.avatar)
+        console.log("Employee updated", employee)
+      } else {
+        console.log("loading avatar", employee)
+      }
+    }
+    , [employee])
 
     return (
       <Box
@@ -85,7 +91,7 @@ function EmployeeAvatarUpload(
           Upload Avatar
         </FormLabel>
         <WrapItem>
-              <Avatar size='2xl' name={employee?.name} src={avatar} />{''}
+          <Avatar size='2xl' name={employee?.name} src={avatar} loading="lazy"/>
         </WrapItem>
         <InputGroup>
           <Input
