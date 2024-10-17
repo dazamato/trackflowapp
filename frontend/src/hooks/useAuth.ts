@@ -68,6 +68,7 @@ const useAuth = () => {
       try {
         const employee = await EmployeesService.readEmployeeMe()
         localStorage.setItem("employee_id", employee.id)
+        localStorage.setItem("business_id", employee.business_id)
         navigate({ to: "/" })
       }
       catch (err) {
@@ -92,7 +93,9 @@ const useAuth = () => {
   const logout = () => {
     localStorage.removeItem("access_token")
     localStorage.removeItem("employee_id")
+    localStorage.removeItem("business_id")
     navigate({ to: "/login" })
+    window.location.reload();
   }
 
   return {

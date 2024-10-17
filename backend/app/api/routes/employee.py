@@ -282,6 +282,16 @@ async def create_upload_file(
     avatar_path = f"/app/app/static/avatars/{id}.png"
     logger.info(f"Saving avatar to {avatar_path}")
     
+    # Delete the old avatar if it exists
+    if employee.avatar:
+        old_avatar_path = f"/app/app/static/avatars/{employee.avatar}.png"
+        if os.path.exists(old_avatar_path):
+            try:
+                os.remove(old_avatar_path)
+            except Exception as e:
+                logger.error(f"Error deleting old avatar: {e}")
+                raise HTTPException(status_code=400, detail="Error updating old avatar")
+    
     try:
         with open(avatar_path, "wb") as buffer:
             buffer.write(file.file.read())
