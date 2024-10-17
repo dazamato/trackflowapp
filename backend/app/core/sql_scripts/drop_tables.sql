@@ -12,6 +12,12 @@ DROP TABLE IF EXISTS public.sale CASCADE;
 DROP TABLE IF EXISTS public.item CASCADE;
 DROP TABLE IF EXISTS public.stage CASCADE;
 DROP TABLE IF EXISTS public.lead CASCADE;
+DROP TABLE IF EXISTS public.address CASCADE;
+DROP TABLE IF EXISTS public.proposal CASCADE;
 
 
 DELETE from public.alembic_version;
+
+
+DELETE FROM public.employee
+WHERE id='07b04f2e-00fd-4b50-8acb-839ce7939665'::uuid;

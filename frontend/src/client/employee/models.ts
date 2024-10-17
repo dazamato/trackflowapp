@@ -47,3 +47,6 @@ export type NewInvite = {
   new_user: Array<UserCreate>
   new_employee: Array<EmployeeCreateBusiness>
 }
+export type AvatarUploadInput = {
+  avatarFile: FileList
+}

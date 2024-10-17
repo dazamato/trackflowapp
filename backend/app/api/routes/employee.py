@@ -277,33 +277,32 @@ async def create_upload_file(
     os.makedirs("/app/app/static/avatars", exist_ok=True)
 
     # Save the avatar to the static files directory
-    avatar_path = f"/app/app/static/avatars/{uuid.uuid4()}.png"
+    id = uuid.uuid4()
+    logger.info(f"Saving avatar with id {id}")
+    avatar_path = f"/app/app/static/avatars/{id}.png"
     logger.info(f"Saving avatar to {avatar_path}")
-    with open(avatar_path, "wb") as buffer:
-        buffer.write(file.file.read())
     
-    employee.avatar = avatar_path
+    try:
+        with open(avatar_path, "wb") as buffer:
+            buffer.write(file.file.read())
+    except Exception as e:
+        logger.error(f"Error saving avatar: {e}")
+        raise HTTPException(status_code=400, detail="Error saving avatar")
+    try:
+        employee.avatar = id
+    except Exception as e:
+        logger.error(f"Error adding avatar: {e}")
+        raise HTTPException(status_code=400, detail="Error adding avatar")
+    
     session.add(employee)
     session.commit()
     session.refresh(employee)
     return employee
 
-@router.get("/get_avatar/")
-async def get_image(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser
-    ):
-    statement = (
-        select(Employee)
-        .where(Employee.user_id == current_user.id)
-    )
-    
-    employee = session.exec(statement).first()
-    if not employee:
-        raise HTTPException(status_code=404, detail="User not registered as employee")
-    
-    image_path = Path(employee.avatar)
+@router.get("/get_avatar/{id}")
+async def get_avatar(id: uuid.UUID):
+    avatar_path = f"/app/app/static/avatars/{id}.png"
+    image_path = Path(avatar_path)
     if not image_path.is_file():
         raise HTTPException(status_code=404, detail="Image not found")
     return FileResponse(image_path)

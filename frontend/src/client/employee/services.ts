@@ -37,6 +37,9 @@ export type TDataUpdateEmployee = {
 export type TDataDeleteEmployee = {
   id: string
 }
+export type TDataUpdateEmployeeAvatar = {
+  avatarFile: File
+}
 
 
 export class EmployeesService {
@@ -178,6 +181,30 @@ export class EmployeesService {
       },
       body: requestBody,
       mediaType: "application/json",
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+  /**
+   * Post avatar file for Employee
+   * Post an avatar file for Employee.
+   * @returns EmployeePublic Successful Response
+   * @throws ApiError
+   */
+  public static updateEmployeeAvatar(
+    data: TDataUpdateEmployeeAvatar,
+  ): CancelablePromise<EmployeePublic> {
+    const { avatarFile } = data
+    console.log(avatarFile)
+    const formData = new FormData()
+    formData.append('file', avatarFile)
+
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/v1/employee/update_avatar/",
+      body: formData,
+      mediaType: "multipart/form-data",
       errors: {
         422: `Validation Error`,
       },

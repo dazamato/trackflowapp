@@ -12,7 +12,7 @@ class EmployeeBase(SQLModel):
     name: str = Field(index=True, min_length=1, max_length=255)
     description: Optional[str] = Field(default=None, max_length=255)
     role: Optional[str] = Field(default=None, max_length=100)
-    avatar: Optional[str] = Field(default=None, max_length=255)
+    avatar: Optional[uuid.UUID] = Field(default=None, max_length=255)
 
 # Properties to receive on employee creation
 class EmployeeCreate(EmployeeBase):
@@ -27,7 +27,7 @@ class EmployeeUpdate(SQLModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=255)
     description: Optional[str] = Field(default=None, max_length=255)
     role: Optional[str] = Field(default=None, max_length=100)
-    avatar: Optional[str] = Field(default=None, max_length=255)
+    avatar: Optional[uuid.UUID] = Field(default=None, max_length=255)
     is_active: Optional[bool] = Field(default=True)
     business_id: Optional[uuid.UUID] = None
 
@@ -39,6 +39,7 @@ class UserShow(SQLModel):
 class Employee(EmployeeBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     is_active: bool = Field(default=True)
+    avatar: Optional[uuid.UUID] = Field(default=None, max_length=255)
     user_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
@@ -56,6 +57,7 @@ class Employee(EmployeeBase, table=True):
 class EmployeePublic(EmployeeBase):
     id: uuid.UUID
     user_id: uuid.UUID
+    avatar: Optional[uuid.UUID]
     business: Business | None
     created_at: datetime
     updated_at: datetime
