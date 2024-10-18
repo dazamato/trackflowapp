@@ -8,6 +8,9 @@ import {
     WrapItem,
     Avatar,
     Box,
+    Divider,
+    Stack,
+    Center,
   } from "@chakra-ui/react"
   import { useMutation, useQueryClient} from "@tanstack/react-query"
   import { FiUpload } from "react-icons/fi"
@@ -87,13 +90,18 @@ function EmployeeAvatarUpload(
           onSubmit={handleSubmit(onSubmit)}
         >
       <FormControl id="avatarFile" isInvalid>
-        <FormLabel htmlFor="avatarFile" srOnly>
-          Upload Avatar
-        </FormLabel>
-        <WrapItem>
-          <Avatar size='2xl' name={employee?.name} src={avatar} loading="lazy"/>
-        </WrapItem>
-        <InputGroup>
+        <Stack direction='row' h={{ sm: "full", md: "50%" }} w={{ sm: "full", md: "50%" }}>
+          <Center height='130px'>
+            <Divider orientation='vertical' />
+          </Center>
+          <FormLabel htmlFor="avatarFile" srOnly>
+            Upload Avatar
+          </FormLabel>
+          <WrapItem>
+            <Avatar size='2xl' name={employee?.name} src={avatar} loading="lazy"/>
+          </WrapItem>
+        <Stack>
+        <InputGroup w='300px'>
           <Input
             type="file"
             id="avatarFile"
@@ -103,16 +111,19 @@ function EmployeeAvatarUpload(
             multiple={false}
             onChange={handleSelectImage}
           />
-          
         </InputGroup>
-        <Button
-          type="submit"
-          isLoading={isSubmitting}
-          leftIcon={<Icon as={FiUpload} />}
-          mt={2}
-        >
-          Upload
-        </Button>
+        <Stack direction='row' spacing={4}>
+            <Button
+              type="submit"
+              isLoading={isSubmitting}
+              leftIcon={<Icon as={FiUpload} />}
+              mt={2}
+            >
+              Upload
+            </Button>
+        </Stack>
+        </Stack>
+        </Stack>
       </FormControl>
       </Box>
     )

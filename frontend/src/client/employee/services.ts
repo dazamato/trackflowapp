@@ -1,3 +1,4 @@
+import { UUID } from "crypto"
 import type { CancelablePromise } from "../core/CancelablePromise"
 import { OpenAPI } from "../core/OpenAPI"
 import { request as __request } from "../core/request"
@@ -129,10 +130,12 @@ export class EmployeesService {
    */
 
   public static inviteEmployee(data: TDataInvite): CancelablePromise<Message> {
+    // /invite_employee/{email}/{business_id}
     const { email, business_id } = data
+
     return __request(OpenAPI, {
       method: "POST",
-      url: "/api/v1/employee/invite_employee/{email}/{business_id}",
+      url: "/api/v1/employee/invite_employee/",
       query: {
         email,
         business_id

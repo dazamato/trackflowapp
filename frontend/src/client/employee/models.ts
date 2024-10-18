@@ -1,5 +1,6 @@
 import type {UserCreate} from '../user/models'
 import type { BusinessPublic } from '../business/models'
+import { UUID } from 'crypto'
 
 export type EmployeeCreateBusiness = {
   name: string
@@ -46,6 +47,10 @@ export type NewInvite = {
   token: string
   new_user: Array<UserCreate>
   new_employee: Array<EmployeeCreateBusiness>
+}
+export type InviteRequest = {
+  email: string
+  business_id: string
 }
 export type AvatarUploadInput = {
   avatarFile: FileList

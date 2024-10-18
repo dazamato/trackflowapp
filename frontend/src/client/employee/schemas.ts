@@ -275,3 +275,13 @@ export const $NewInvite = {
     },
   }
 }
+export const $InviteRequest = {
+  properties: {
+    email: {
+      type: "string",
+      isRequired: true,
+      maxLength: 255,
+    }
+  },
+  
+}

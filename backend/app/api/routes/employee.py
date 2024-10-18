@@ -148,7 +148,7 @@ def create_admin_employee_with_business(
         business_id=employee_in.business_id)
     return employee
 
-@router.post("/invite_employee/{email}/{business_id}")
+@router.post("/invite_employee/")
 def invite_employee(email: str, business_id: uuid.UUID, session: SessionDep, current_user: CurrentUser) -> Message:
     """
     Invite employee to Business

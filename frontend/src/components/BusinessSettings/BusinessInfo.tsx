@@ -156,6 +156,11 @@ import {
               )}
             </Flex>
           </Box>
+          <Box>
+            <Text mt={4} fontSize="sm" color="ui.dim">
+              * This information is visible to all employees in your company.
+            </Text>
+          </Box>
         </Container>
       </>
     )

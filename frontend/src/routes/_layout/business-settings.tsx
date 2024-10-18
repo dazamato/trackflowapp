@@ -16,11 +16,12 @@ import {
 //   import DeleteAccount from "../../components/BusinessSettings/DeleteAccount"
   import BusinessEmployeeInfo from "../../components/BusinessSettings/BusinessEmployeeInfo"
   import BusinessInfo from "../../components/BusinessSettings/BusinessInfo"
+  import AddEmployeeToBusiness from "../../components/BusinessSettings/AddEmployeeToBusiness"
   
   const tabsConfig = [
     { title: "My Position", component: BusinessEmployeeInfo },
     { title: "Company information", component: BusinessInfo },
-    // { title: "Appearance", component: Appearance },
+    { title: "Team", component: AddEmployeeToBusiness },
     // { title: "Danger zone", component: DeleteAccount },
   ]
   

@@ -10,6 +10,7 @@ import {
   EmployeesService,
   BusinessesService,
   type BusinessCreate,
+  type InviteRequest
 
 } from "../client"
 import useCustomToast from "./useCustomToast"
@@ -43,6 +44,10 @@ const useEmployee = () => {
         const employee = await EmployeesService.readEmployeeMe()
         localStorage.setItem("employee_id", employee.id)
     }
+    const employeeInvite = async (data: InviteRequest) => {
+      await EmployeesService.inviteEmployee(data)
+    }
+
 
     const businessRegisterMutation = useMutation({
         mutationFn: (data: BusinessCreate) => registerEmployee(data),
@@ -67,9 +72,34 @@ const useEmployee = () => {
           queryClient.invalidateQueries({ queryKey: ["currentEmployee"] })
         },
       })
+    
+      const employeeInviteMutation = useMutation({
+          mutationFn: (data: InviteRequest) => employeeInvite(data),
+          onSuccess: () => {
+            navigate({ to: "/" })
+            showToast(
+              "Invite sended.",
+              "Your Invitation has been sended successfully.",
+              "success",
+            )
+          },
+          onError: (err: ApiError) => {
+            let errDetail = (err.body as any)?.detail
+      
+            if (err instanceof AxiosError) {
+              errDetail = err.message
+            }
+      
+            showToast("Something went wrong.", errDetail, "error")
+          },
+          onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ["inviteRequest"] })
+          },
+      })
 
     return {
         businessRegisterMutation,
+        employeeInviteMutation,
         employee,
         unsetEmployee,
         setEmployee,

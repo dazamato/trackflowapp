@@ -10,8 +10,6 @@ import {
     Input,
     Text,
     useColorModeValue,
-    WrapItem,
-    Avatar,
   } from "@chakra-ui/react"
 import { useMutation, useQueryClient} from "@tanstack/react-query"
 import { useState } from "react"

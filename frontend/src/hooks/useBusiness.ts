@@ -64,6 +64,7 @@ const useBusiness = () => {
           queryClient.invalidateQueries({ queryKey: ["currentBusiness"] })
         },
     })
+    
 
     return {
         businessUpdateMutation,
